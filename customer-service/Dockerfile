@@ -2,18 +2,23 @@ FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
+# Копируем родительский POM и POM модуля
 COPY pom.xml .
+COPY customer-service/pom.xml customer-service/pom.xml
 
-RUN mvn dependency:go-offline
+# Скачиваем зависимости
+RUN mvn dependency:go-offline -pl customer-service -am
 
-COPY src ./src
+# Копируем исходный код модуля
+COPY customer-service/src customer-service/src
 
-RUN mvn package -DskipTests
+# Собираем проект
+RUN mvn package -pl customer-service -am -DskipTests
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-COPY --from=build /app/target/customer-service-*.jar app.jar
+COPY --from=build /app/customer-service/target/customer-service-*.jar app.jar
 
 EXPOSE 8080
 
