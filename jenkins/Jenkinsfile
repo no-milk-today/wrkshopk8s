@@ -11,6 +11,13 @@ pipeline {
     }
 
     stages {
+        stage('Clients install') {
+          steps {
+            dir('clients') {
+              sh 'mvn -B -DskipTests clean install'
+            }
+          }
+        }
         stage('Build & Unit Tests') {
             parallel {
                 stage('Customer Service') {
