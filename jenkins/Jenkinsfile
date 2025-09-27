@@ -11,11 +11,10 @@ pipeline {
     }
 
     stages {
-        stage('Clients install') {
+        stage('Maven reactor build') {
           steps {
-            dir('clients') {
-              sh 'mvn -B -DskipTests clean install'
-            }
+            // запуск из корня репозитория (там, где общий parent/aggregator POM)
+            sh 'mvn -B -U -DskipTests clean install'
           }
         }
         stage('Build & Unit Tests') {
