@@ -2,24 +2,19 @@ FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-# Копируем родительский POM и POM модуля
 COPY pom.xml .
-COPY order-service/pom.xml order-service/pom.xml
 
-# Скачиваем зависимости
-RUN mvn dependency:go-offline -pl order-service -am
+RUN mvn dependency:go-offline
 
-# Копируем исходный код модуля
-COPY order-service/src order-service/src
+COPY src ./src
 
-# Собираем проект
-RUN mvn package -pl order-service -am -DskipTests
+RUN mvn package -DskipTests
 
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=build /app/order-service/target/order-service-*.jar app.jar
+COPY --from=build /app/target/order-service-*.jar app.jar
 
 EXPOSE 8081
 
