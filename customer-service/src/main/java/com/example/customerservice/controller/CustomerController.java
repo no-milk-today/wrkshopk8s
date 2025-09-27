@@ -1,5 +1,7 @@
 package com.example.customerservice.controller;
 
+import com.example.clients.order.OrderClient;
+import com.example.clients.order.OrderResponse;
 import com.example.customerservice.model.Customer;
 import com.example.customerservice.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private OrderClient orderClient;
 
     
     @GetMapping
@@ -35,6 +40,11 @@ public class CustomerController {
         
         return customer.map(ResponseEntity::ok)
                        .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/orders")
+    public List<OrderResponse> getOrdersForCustomer(@PathVariable Long id) {
+        return orderClient.findByCustomerId(id);
     }
 
     

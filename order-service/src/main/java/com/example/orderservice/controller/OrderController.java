@@ -1,5 +1,6 @@
 package com.example.orderservice.controller;
 
+import com.example.clients.order.OrderResponse;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,15 @@ public class OrderController {
     }
 
     @GetMapping("/customer/{customerId}")
-    public List<Order> getOrdersByCustomerId(@PathVariable Long customerId) {
-        return orderRepository.findByCustomerId(customerId);
+    public List<OrderResponse> getOrdersByCustomerId(@PathVariable Long customerId) {
+        return orderRepository.findByCustomerId(customerId).stream()
+                .map(o -> new OrderResponse(
+                        o.getId(),
+                        o.getCustomerId(),
+                        o.getProductDetails(),
+                        o.getAmount(),
+                        o.getOrderDate()
+                ))
+                .toList();
     }
 } 
