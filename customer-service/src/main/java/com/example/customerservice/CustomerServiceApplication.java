@@ -11,8 +11,7 @@ import org.springframework.context.annotation.PropertySources;
         basePackages = "com.example.clients"
 )
 @PropertySources({
-//      @PropertySource("classpath:clients-${spring.profiles.active}.properties")
-        @PropertySource("classpath:clients-default.properties")
+        @PropertySource("classpath:clients-${spring.profiles.active}.properties")
 })
 public class CustomerServiceApplication {
 

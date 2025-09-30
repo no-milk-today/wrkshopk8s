@@ -1,6 +1,8 @@
 # Global values (if any)
 global:
   domain: myapp.local # Example domain for ingress
+  spring:
+    profile: kube
 
 # Configuration for the customer-service subchart
 # NOTE: For local development (Minikube/Kind/Docker Desktop), build the image locally
