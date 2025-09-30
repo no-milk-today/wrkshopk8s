@@ -15,6 +15,7 @@ pipeline {
             parallel {
                 stage('Customer Service') {
                     steps {
+                        // run from / so that parent pom and modules are visible
                         sh 'mvn -pl customer-service -am clean test'
                     }
                 }
@@ -23,6 +24,16 @@ pipeline {
                         sh 'mvn -pl order-service -am clean test'
                     }
                 }
+            }
+        }
+
+        stage('Package modules') {
+            steps {
+                // package both modules -am to build dependencies too
+                sh '''
+                mvn -pl customer-service -am -DskipTests package
+                mvn -pl order-service -am -DskipTests package
+                '''
             }
         }
 
