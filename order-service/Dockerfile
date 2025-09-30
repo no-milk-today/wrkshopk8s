@@ -1,20 +1,20 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS build
-
 WORKDIR /app
 
 COPY pom.xml .
+COPY order-service/pom.xml order-service/pom.xml
 
-RUN mvn dependency:go-offline
+RUN mvn -B -pl order-service -am dependency:go-offline
 
-COPY src ./src
+COPY . .
 
-RUN mvn package -DskipTests
+RUN mvn -B -pl order-service -am package -DskipTests
 
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=build /app/target/order-service-*.jar app.jar
+COPY --from=build /app/order-service/target/order-service-*.jar app.jar
 
 EXPOSE 8081
 
