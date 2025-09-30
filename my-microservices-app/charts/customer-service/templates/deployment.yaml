@@ -61,7 +61,7 @@ spec:
                   name: {{ .Release.Name }}-customer-db
                   key: password
             - name: SPRING_PROFILES_ACTIVE
-              value: {{ .Values.spring.profile | default .Values.global.spring.profile | default "kube" }}
+              value: {{ get .Values.spring "profile" | default .Values.global.spring.profile | default "kube" | quote }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
