@@ -35,7 +35,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.targetPort }} # Use the service targetPort value from values.yaml
+              containerPort: {{ .Values.service.port }} # Use the service port value from values.yaml
               protocol: TCP
           livenessProbe: # Example for Spring Boot Actuator
             httpGet:
@@ -60,8 +60,6 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-order-db
                   key: password
-            - name: SPRING_PROFILES_ACTIVE
-              value: "kube"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

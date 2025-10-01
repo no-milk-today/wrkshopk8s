@@ -40,8 +40,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80 # Внешний порт для других подов
-  targetPort: 8081 # Реальный порт контейнера Spring Boot
+  port: 8081 # Default port, overridden by umbrella
 
 ingress:
   enabled: true

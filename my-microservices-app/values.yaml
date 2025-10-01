@@ -16,8 +16,7 @@ customer-service:
     # -----------------------------
   service:
     type: ClusterIP
-    port: 80
-    targetPort: 8080
+    port: 8080
   ingress:
     enabled: true
     className: "nginx" # Specify your ingress controller class
@@ -47,8 +46,7 @@ order-service:
     # -----------------------------
   service:
     type: ClusterIP
-    port: 80
-    targetPort: 8081
+    port: 8081 # Different port for order service
   ingress:
     enabled: true
     className: "nginx"
