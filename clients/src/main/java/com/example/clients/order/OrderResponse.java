@@ -1,11 +1,18 @@
 package com.example.clients.order;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
-public record OrderResponse(
-        Long id,
-        Long customerId,
-        String productDetails,
-        Double amount,
-        LocalDateTime orderDate
-) {}
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderResponse {
+    private Long id;
+    private Long customerId;
+    private String productDetails;
+    private Double amount;
+    private LocalDateTime orderDate;
+}

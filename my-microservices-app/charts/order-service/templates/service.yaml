@@ -8,8 +8,8 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http # Match the container port *name* in the deployment
+      targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
-      name: http
+      name: http # do we need this?
   selector:
     {{- include "order-service.selectorLabels" . | nindent 4 }} 

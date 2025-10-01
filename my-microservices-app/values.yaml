@@ -1,8 +1,6 @@
 # Global values (if any)
 global:
   domain: myapp.local # Example domain for ingress
-  spring:
-    profile: kube
 
 # Configuration for the customer-service subchart
 # NOTE: For local development (Minikube/Kind/Docker Desktop), build the image locally
@@ -18,7 +16,8 @@ customer-service:
     # -----------------------------
   service:
     type: ClusterIP
-    port: 8080
+    port: 80
+    targetPort: 8080
   ingress:
     enabled: true
     className: "nginx" # Specify your ingress controller class
@@ -48,7 +47,8 @@ order-service:
     # -----------------------------
   service:
     type: ClusterIP
-    port: 8081 # Different port for order service
+    port: 80
+    targetPort: 8081
   ingress:
     enabled: true
     className: "nginx"
