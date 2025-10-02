@@ -55,6 +55,8 @@ pipeline {
                   --set auth.database=${DB_NAME} \\
                   --set auth.username=${DB_USER} \\
                   --set auth.password=${DB_PASSWORD} \\
+                  --set image.registry=docker.io \\
+                  --set image.repository=library/postgres \\
                   --set image.tag=14
                 """
             }
@@ -113,6 +115,8 @@ pipeline {
                   --set auth.database=${DB_NAME} \\
                   --set auth.username=${DB_USER} \\
                   --set auth.password=${DB_PASSWORD} \\
+                  --set image.registry=docker.io \\
+                  --set image.repository=library/postgres \\
                   --set image.tag=14
                 """
             }
