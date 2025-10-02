@@ -15,16 +15,13 @@ pipeline {
             parallel {
                 stage('Customer Service') {
                     steps {
-                        dir('customer-service') {
-                            sh 'mvn clean test'
-                        }
+                        // run from / so that parent pom and modules are visible
+                        sh 'mvn -pl customer-service -am clean test'
                     }
                 }
                 stage('Order Service') {
                     steps {
-                        dir('order-service') {
-                            sh 'mvn clean test'
-                        }
+                        sh 'mvn -pl order-service -am clean test'
                     }
                 }
             }
@@ -33,8 +30,8 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 sh """
-                docker build -t customer-service:${IMAGE_TAG} customer-service
-                docker build -t order-service:${IMAGE_TAG} order-service
+                docker build -t customer-service:${IMAGE_TAG} -f customer-service/Dockerfile .
+                docker build -t order-service:${IMAGE_TAG} -f order-service/Dockerfile .
                 """
             }
         }
