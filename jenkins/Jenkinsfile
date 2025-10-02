@@ -50,10 +50,12 @@ pipeline {
             steps {
                 sh """
                 helm upgrade --install postgres oci://registry-1.docker.io/bitnamicharts/postgresql \\
+                  --version 14.2.3 \\
                   --namespace test --create-namespace \\
                   --set auth.database=${DB_NAME} \\
                   --set auth.username=${DB_USER} \\
-                  --set auth.password=${DB_PASSWORD}
+                  --set auth.password=${DB_PASSWORD} \\
+                  --set image.tag=14
                 """
             }
         }
@@ -106,10 +108,12 @@ pipeline {
             steps {
                 sh """
                 helm upgrade --install postgres oci://registry-1.docker.io/bitnamicharts/postgresql \\
+                  --version 14.2.3 \\
                   --namespace prod --create-namespace \\
                   --set auth.database=${DB_NAME} \\
                   --set auth.username=${DB_USER} \\
-                  --set auth.password=${DB_PASSWORD}
+                  --set auth.password=${DB_PASSWORD} \\
+                  --set image.tag=14
                 """
             }
         }
