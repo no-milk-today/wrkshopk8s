@@ -49,11 +49,26 @@ pipeline {
         stage('Install PostgreSQL to TEST') {
             steps {
                 sh """
-                helm upgrade --install postgres oci://registry-1.docker.io/bitnamilegacy/postgresql \\
+                helm upgrade --install postgres oci://registry-1.docker.io/bitnamicharts/postgresql \\
                   --namespace test --create-namespace \\
                   --set auth.database=${DB_NAME} \\
                   --set auth.username=${DB_USER} \\
-                  --set auth.password=${DB_PASSWORD}
+                  --set auth.password=${DB_PASSWORD} \\
+                  --set image.registry=docker.io \\
+                  --set image.repository=bitnamilegacy/postgresql \\
+                  --set image.tag=latest \\
+                  --set image.pullPolicy=IfNotPresent \\
+                  --set primary.persistence.enabled=false \\
+                  --wait --timeout 5m
+                """
+            }
+        }
+
+        stage('Wait for PostgreSQL in TEST') {
+            steps {
+                sh """
+                kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql \\
+                  -n test --timeout=300s
                 """
             }
         }
@@ -79,6 +94,7 @@ pipeline {
                   --namespace test --create-namespace \\
                   --set image.repository=customer-service \\
                   --set image.tag=${IMAGE_TAG} \\
+                  --set image.pullPolicy=IfNotPresent \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=customer.test.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
@@ -88,6 +104,7 @@ pipeline {
                   --namespace test --create-namespace \\
                   --set image.repository=order-service \\
                   --set image.tag=${IMAGE_TAG} \\
+                  --set image.pullPolicy=IfNotPresent \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=order.test.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
@@ -105,11 +122,26 @@ pipeline {
         stage('Install PostgreSQL to PROD') {
             steps {
                 sh """
-                helm upgrade --install postgres oci://registry-1.docker.io/bitnamilegacy/postgresql \\
+                helm upgrade --install postgres oci://registry-1.docker.io/bitnamicharts/postgresql \\
                   --namespace prod --create-namespace \\
                   --set auth.database=${DB_NAME} \\
                   --set auth.username=${DB_USER} \\
-                  --set auth.password=${DB_PASSWORD}
+                  --set auth.password=${DB_PASSWORD} \\
+                  --set image.registry=docker.io \\
+                  --set image.repository=bitnamilegacy/postgresql \\
+                  --set image.tag=latest \\
+                  --set image.pullPolicy=IfNotPresent \\
+                  --set primary.persistence.enabled=false \\
+                  --wait --timeout 5m
+                """
+            }
+        }
+
+        stage('Wait for PostgreSQL in PROD') {
+            steps {
+                sh """
+                kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql \\
+                  -n prod --timeout=300s
                 """
             }
         }
@@ -135,6 +167,7 @@ pipeline {
                   --namespace prod --create-namespace \\
                   --set image.repository=customer-service \\
                   --set image.tag=${IMAGE_TAG} \\
+                  --set image.pullPolicy=IfNotPresent \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=customer.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
@@ -144,6 +177,7 @@ pipeline {
                   --namespace prod --create-namespace \\
                   --set image.repository=order-service \\
                   --set image.tag=${IMAGE_TAG} \\
+                  --set image.pullPolicy=IfNotPresent \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=order.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
