@@ -4,6 +4,8 @@ WORKDIR /app
 COPY pom.xml .
 COPY order-service/pom.xml order-service/pom.xml
 COPY customer-service/pom.xml customer-service/pom.xml
+COPY fraud-service/pom.xml fraud-service/pom.xml
+COPY notification-service/pom.xml notification-service/pom.xml
 COPY clients/pom.xml clients/pom.xml
 
 RUN mvn -B -pl order-service -am dependency:go-offline
@@ -18,6 +20,6 @@ WORKDIR /app
 
 COPY --from=build /app/order-service/target/order-service-*.jar app.jar
 
-EXPOSE 8081
+EXPOSE 8084
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
