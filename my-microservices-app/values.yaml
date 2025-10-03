@@ -16,7 +16,7 @@ customer-service:
     # -----------------------------
   service:
     type: ClusterIP
-    port: 8080
+    port: 8081
   ingress:
     enabled: true
     className: "nginx" # Specify your ingress controller class
@@ -34,6 +34,52 @@ customer-service:
     # database_password_secret: "{{ .Release.Name }}-customer-db-postgresql" # Reference to secret created by DB chart
     # database_password_secret_key: "postgresql-password" # Key within the secret
 
+fraud-service:
+  replicaCount: 1
+  image:
+    repository: fraud-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8082
+  ingress:
+    enabled: true
+    className: "nginx"
+    hosts:
+      - host: fraud.myapp.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+  config:
+    database_url: "jdbc:postgresql://{{ .Release.Name }}-fraud-db:5432/frauddb"
+    database_username: "fraud_user"
+    # database_password_secret: "{{ .Release.Name }}-fraud-db-postgresql"
+    # database_password_secret_key: "postgresql-password"
+
+notification-service:
+  replicaCount: 1
+  image:
+    repository: notification-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8083
+  ingress:
+    enabled: true
+    className: "nginx"
+    hosts:
+      - host: notification.myapp.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+  config:
+    database_url: "jdbc:postgresql://{{ .Release.Name }}-notification-db:5432/notificationdb"
+    database_username: "notification_user"
+    # database_password_secret: "{{ .Release.Name }}-notification-db-postgresql"
+    # database_password_secret_key: "postgresql-password"
+
 # Configuration for the order-service subchart
 # NOTE: Build image locally: `docker build -t order-service:latest in order-service dir
 order-service:
@@ -46,7 +92,7 @@ order-service:
     # -----------------------------
   service:
     type: ClusterIP
-    port: 8081 # Different port for order service
+    port: 8084 # Different port for order service
   ingress:
     enabled: true
     className: "nginx"

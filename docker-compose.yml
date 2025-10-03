@@ -1,0 +1,91 @@
+services:
+  customer-db:
+    container_name: customer-db
+    image: postgres:15
+    environment:
+      POSTGRES_DB: customer
+      POSTGRES_USER: ${PG_USER:-customer_user}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-password}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres_customer:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fraud-db:
+    container_name: fraud-db
+    image: postgres:15
+    environment:
+      POSTGRES_DB: fraud
+      POSTGRES_USER: ${PG_USER:-fraud_user}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-password}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres_fraud:/data/postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  notification-db:
+    container_name: notification-db
+    image: postgres:15
+    environment:
+      POSTGRES_DB: notification
+      POSTGRES_USER: ${PG_USER:-notification_user}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-password}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres_notification:/data/postgres
+    ports:
+      - "5434:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+#  keycloak:
+#    container_name: keycloak-bank
+#    image: quay.io/keycloak/keycloak:26.1.3
+#    command: ["start-dev", "--import-realm"]
+#    ports:
+#      - "8090:8080"
+#    environment:
+#      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+#      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+#    volumes:
+#      - ./keycloak/config:/opt/keycloak/data/import
+#    networks:
+#      - postgres
+#    restart: unless-stopped
+#    depends_on:
+#      - customer-db
+
+networks:
+  postgres:
+    driver: bridge
+  spring:
+    driver: bridge
+
+volumes:
+  postgres_customer:
+  postgres_fraud:
+  postgres_notification:

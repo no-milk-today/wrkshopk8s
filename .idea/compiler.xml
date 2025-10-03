@@ -2,13 +2,16 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="customer-service" />
+        <module name="fraud-service" />
         <module name="order-service" />
         <module name="clients" />
+        <module name="customer-service" />
+        <module name="notification-service" />
       </profile>
     </annotationProcessing>
   </component>

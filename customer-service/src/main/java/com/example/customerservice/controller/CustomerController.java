@@ -1,50 +1,69 @@
 package com.example.customerservice.controller;
 
-import com.example.customerservice.model.Customer;
-import com.example.customerservice.repository.CustomerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.example.clients.customer.*;
+import com.example.clients.customer.CustomerRegistrationRequest;
+import com.example.clients.customer.CustomerRegistrationResponse;
+import com.example.clients.customer.MainPageData;
+import com.example.customerservice.service.CustomerService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/customers") 
+@RequestMapping("/api/v1/customers")
+@RequiredArgsConstructor
+@Slf4j
 public class CustomerController {
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerService customerService;
 
-    
-    @GetMapping
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    @PostMapping("/signup")
+    public CustomerRegistrationResponse registerCustomer(@RequestBody CustomerRegistrationRequest customerRegistrationRequest) {
+        log.info("new customer registration {}", customerRegistrationRequest);
+        return customerService.registerCustomer(customerRegistrationRequest);
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("TEST!");
+    @GetMapping("/public")
+    public String getCustomer() {
+        return "Customers public endpoint";
     }
 
-    
-    @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
-        Optional<Customer> customer = customerRepository.findById(id);
-        
-        return customer.map(ResponseEntity::ok)
-                       .orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/main")
+    public MainPageData main(@RequestParam("login") String login) {
+        return customerService.getMainData(login);
     }
 
-    
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) 
-    public Customer createCustomer(@RequestBody Customer customer) {
-        
-        
-        return customerRepository.save(customer);
+    @PostMapping("/user/{login}/editUserAccounts")
+    public List<String> editUserAccounts(
+            @PathVariable("login") String login,
+            @RequestBody EditUserAccountsRequest req
+    ) {
+        return customerService.editUserProfile(login, req);
     }
 
-    
+    @PostMapping("/user/{login}/editPassword")
+    public List<String> editPassword(
+            @PathVariable("login") String login,
+            @RequestBody EditPasswordRequest req
+    ) {
+        return customerService.editPassword(login, req);
+    }
+
+    @GetMapping("/{login}")
+    public CustomerDto getCustomer(@PathVariable("login") String login) {
+        return customerService.getCustomerByLogin(login);
+    }
+
+    @PutMapping("/{login}/accounts/{currency}/balance")
+    public void updateAccountBalance(
+            @PathVariable("login") String login,
+            @PathVariable("currency") String currency,
+            @RequestBody BigDecimal newBalance) {
+
+        log.info("Updating account balance for user {}: {} {} = {}", login, currency, "new balance", newBalance);
+        customerService.updateAccountBalance(login, currency, newBalance);
+    }
 }

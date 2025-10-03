@@ -1,6 +1,6 @@
 apiVersion: v2
 name: my-microservices-app
-description: Umbrella chart for Customer and Order microservices
+description: Umbrella chart for bank microservices
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
@@ -10,6 +10,16 @@ dependencies:
   - name: customer-service
     version: "0.1.0"
     repository: "file://./charts/customer-service" # Local path reference
+
+  # Subchart for Fraud Service
+  - name: fraud-service
+    version: "0.1.0"
+    repository: "file://./charts/fraud-service" # Local path reference
+
+  # Subchart for Notification Service
+  - name: notification-service
+    version: "0.1.0"
+    repository: "file://./charts/notification-service" # Local path reference
 
   # Subchart for Order Service
   - name: order-service
@@ -22,6 +32,20 @@ dependencies:
     repository: "oci://registry-1.docker.io/bitnamicharts"
     alias: customer-db # Alias to distinguish this instance
     condition: customer-db.enabled # Allow disabling if needed
+
+  # Dependency for Fraud DB (e.g., PostgreSQL)
+  - name: postgresql
+    version: "15.5.32"
+    repository: "oci://registry-1.docker.io/bitnamicharts"
+    alias: fraud-db
+    condition: fraud-db.enabled
+
+  # Dependency for Notification DB (e.g., PostgreSQL)
+  - name: postgresql
+    version: "15.5.32"
+    repository: "oci://registry-1.docker.io/bitnamicharts"
+    alias: notification-db
+    condition: notification-db.enabled
 
  # Dependency for Order DB (e.g., PostgreSQL)
   - name: postgresql

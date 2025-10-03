@@ -94,7 +94,6 @@ pipeline {
                   --namespace test --create-namespace \\
                   --set image.repository=customer-service \\
                   --set image.tag=${IMAGE_TAG} \\
-                  --set image.pullPolicy=IfNotPresent \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=customer.test.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
@@ -104,7 +103,6 @@ pipeline {
                   --namespace test --create-namespace \\
                   --set image.repository=order-service \\
                   --set image.tag=${IMAGE_TAG} \\
-                  --set image.pullPolicy=IfNotPresent \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=order.test.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
@@ -167,7 +165,6 @@ pipeline {
                   --namespace prod --create-namespace \\
                   --set image.repository=customer-service \\
                   --set image.tag=${IMAGE_TAG} \\
-                  --set image.pullPolicy=IfNotPresent \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=customer.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
@@ -177,7 +174,6 @@ pipeline {
                   --namespace prod --create-namespace \\
                   --set image.repository=order-service \\
                   --set image.tag=${IMAGE_TAG} \\
-                  --set image.pullPolicy=IfNotPresent \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=order.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
