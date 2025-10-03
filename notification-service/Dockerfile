@@ -3,7 +3,6 @@ WORKDIR /app
 
 COPY pom.xml .
 COPY notification-service/pom.xml notification-service/pom.xml
-COPY customer-service/pom.xml customer-service/pom.xml
 COPY clients/pom.xml clients/pom.xml
 
 RUN mvn -B -pl notification-service -am dependency:go-offline
