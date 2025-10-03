@@ -24,6 +24,16 @@ pipeline {
                         sh 'mvn -pl order-service -am clean test'
                     }
                 }
+                stage('Fraud Service') {
+                    steps {
+                        sh 'mvn -pl fraud-service -am clean test'
+                    }
+                }
+                stage('Notification Service') {
+                    steps {
+                        sh 'mvn -pl notification-service -am clean test'
+                    }
+                }
             }
         }
 
@@ -107,6 +117,24 @@ pipeline {
                   --set ingress.hosts[0].host=order.test.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+
+                helm upgrade --install fraud-service my-microservices-app/charts/fraud-service \\
+                  --namespace test --create-namespace \\
+                  --set image.repository=fraud-service \\
+                  --set image.tag=${IMAGE_TAG} \\
+                  --set ingress.enabled=true \\
+                  --set ingress.hosts[0].host=fraud.test.local \\
+                  --set ingress.hosts[0].paths[0].path="/" \\
+                  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+
+                helm upgrade --install notification-service my-microservices-app/charts/notification-service \\
+                  --namespace test --create-namespace \\
+                  --set image.repository=notification-service \\
+                  --set image.tag=${IMAGE_TAG} \\
+                  --set ingress.enabled=true \\
+                  --set ingress.hosts[0].host=notification.test.local \\
+                  --set ingress.hosts[0].paths[0].path="/" \\
+                  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
                 """
             }
         }
@@ -176,6 +204,24 @@ pipeline {
                   --set image.tag=${IMAGE_TAG} \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=order.prod.local \\
+                  --set ingress.hosts[0].paths[0].path="/" \\
+                  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+
+                helm upgrade --install fraud-service my-microservices-app/charts/fraud-service \\
+                  --namespace prod --create-namespace \\
+                  --set image.repository=fraud-service \\
+                  --set image.tag=${IMAGE_TAG} \\
+                  --set ingress.enabled=true \\
+                  --set ingress.hosts[0].host=fraud.prod.local \\
+                  --set ingress.hosts[0].paths[0].path="/" \\
+                  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+
+                helm upgrade --install notification-service my-microservices-app/charts/notification-service \\
+                  --namespace prod --create-namespace \\
+                  --set image.repository=notification-service \\
+                  --set image.tag=${IMAGE_TAG} \\
+                  --set ingress.enabled=true \\
+                  --set ingress.hosts[0].host=notification.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
                 """

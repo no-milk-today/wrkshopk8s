@@ -8,7 +8,7 @@ import org.springframework.context.annotation.PropertySources;
 
 @SpringBootApplication
 @PropertySources({
-        @PropertySource("classpath:clients-default.properties")
+        @PropertySource("classpath:clients-${spring.profiles.active}.properties")
 })
 public class NotificationApplication {
     public static void main(String[] args) {

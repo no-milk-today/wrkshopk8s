@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySources;
 @SpringBootApplication
 @EnableDiscoveryClient
 @PropertySources({
-        @PropertySource("classpath:clients-default.properties")
+        @PropertySource("classpath:clients-${spring.profiles.active}.properties")
 })
 public class FraudApplication {
     public static void main(String[] args) {

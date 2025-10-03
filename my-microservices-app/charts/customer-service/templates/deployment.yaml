@@ -60,6 +60,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-customer-db
                   key: password
+            - name: SPRING_PROFILES_ACTIVE
+              value: "kube"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
