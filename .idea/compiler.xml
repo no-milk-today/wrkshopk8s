@@ -10,6 +10,7 @@
         <module name="fraud-service" />
         <module name="order-service" />
         <module name="clients" />
+        <module name="exchange-service" />
         <module name="customer-service" />
         <module name="notification-service" />
       </profile>
