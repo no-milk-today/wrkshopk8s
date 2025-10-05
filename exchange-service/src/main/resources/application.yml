@@ -1,0 +1,28 @@
+server:
+  port: 8086
+
+# Spring Boot Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+# Datasource Configuration (reads from environment variables set by Helm ConfigMap/Secrets)
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5436/exchange}
+    username: ${SPRING_DATASOURCE_USERNAME:exchange_user} # Password should be provided via SPRING_DATASOURCE_PASSWORD environment variable (ideally from a Secret)
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

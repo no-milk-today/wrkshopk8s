@@ -1,8 +1,7 @@
-package com.example.fraud;
+package com.example.exchange;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
@@ -10,8 +9,8 @@ import org.springframework.context.annotation.PropertySources;
 @PropertySources({
         @PropertySource("classpath:clients-${spring.profiles.active}.properties")
 })
-public class FraudApplication {
+public class ExchangeApplication {
     public static void main(String[] args) {
-        SpringApplication.run(FraudApplication.class, args);
+        SpringApplication.run(ExchangeApplication.class, args);
     }
 }
