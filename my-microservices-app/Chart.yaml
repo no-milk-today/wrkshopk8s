@@ -21,6 +21,11 @@ dependencies:
     version: "0.1.0"
     repository: "file://./charts/notification-service" # Local path reference
 
+  # Subchart for Exchange Service
+  - name: exchange-service
+    version: "0.1.0"
+    repository: "file://./charts/exchange-service"  # Local path reference
+
   # Subchart for Order Service
   - name: order-service
     version: "0.1.0"
@@ -46,6 +51,13 @@ dependencies:
     repository: "oci://registry-1.docker.io/bitnamicharts"
     alias: notification-db
     condition: notification-db.enabled
+
+  # Dependency for Exchange DB (e.g., PostgreSQL)
+  - name: postgresql
+    version: "15.5.32"
+    repository: "oci://registry-1.docker.io/bitnamicharts"
+    alias: exchange-db
+    condition: exchange-db.enabled
 
  # Dependency for Order DB (e.g., PostgreSQL)
   - name: postgresql

@@ -80,6 +80,29 @@ notification-service:
     # database_password_secret: "{{ .Release.Name }}-notification-db-postgresql"
     # database_password_secret_key: "postgresql-password"
 
+exchange-service:
+  replicaCount: 1
+  image:
+    repository: exchange-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8086
+  ingress:
+    enabled: true
+    className: "nginx"
+    hosts:
+      - host: exchange.myapp.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+  config:
+    database_url: "jdbc:postgresql://{{ .Release.Name }}-exchange-db:5432/exchangedb"
+    database_username: "exchange_user"
+    # database_password_secret: "{{ .Release.Name }}-exchange-db-postgresql"
+    # database_password_secret_key: "postgresql-password"
+
 # Configuration for the order-service subchart
 # NOTE: Build image locally: `docker build -t order-service:latest in order-service dir
 order-service:
@@ -136,4 +159,17 @@ order-db:
   primary:
     persistence:
       enabled: true
-      size: 1Gi 
+      size: 1Gi
+
+# Configuration for the exchange-db (PostgreSQL dependency)
+exchange-db:
+  enabled: true
+  auth:
+    database: exchangedb
+    username: exchange_user
+    # existingSecret: "{{ .Release.Name }}-exchange-db-postgresql"
+    password: "changeM3Exchange!"
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
