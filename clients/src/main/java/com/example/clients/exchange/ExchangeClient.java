@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name = "exchange")
+@FeignClient(
+        name = "exchange",
+        url = "${clients.exchange.url}"
+)
 public interface ExchangeClient {
 
     @GetMapping("/api/rates")
