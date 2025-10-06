@@ -8,10 +8,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="fraud-service" />
-        <module name="order-service" />
         <module name="clients" />
+        <module name="exchange-generator-service" />
         <module name="exchange-service" />
         <module name="customer-service" />
+        <module name="order-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>

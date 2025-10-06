@@ -17,6 +17,7 @@
         <module>fraud-service</module>
         <module>notification-service</module>
         <module>exchange-service</module>
+        <module>exchange-generator-service</module>
         <module>clients</module>
     </modules>
 
