@@ -39,6 +39,11 @@ pipeline {
                         sh 'mvn -pl exchange-service -am clean test'
                     }
                 }
+                stage('Exchange Generator Service') {
+                    steps {
+                        sh 'mvn -pl exchange-generator-service -am clean test'
+                    }
+                }
             }
         }
 
@@ -50,6 +55,7 @@ pipeline {
                 docker build -t notification-service:${IMAGE_TAG} -f notification-service/Dockerfile .
                 docker build -t order-service:${IMAGE_TAG} -f order-service/Dockerfile .
                 docker build -t exchange-service:${IMAGE_TAG} -f exchange-service/Dockerfile .
+                docker build -t exchange-generator-service:${IMAGE_TAG} -f exchange-generator-service/Dockerfile .
                 """
             }
         }
@@ -164,6 +170,15 @@ pipeline {
                   --set ingress.hosts[0].host=exchange.test.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+
+                helm upgrade --install exchange-generator-service my-microservices-app/charts/exchange-generator-service \\
+                  --namespace test --create-namespace \\
+                  --set image.repository=exchange-generator-service \\
+                  --set image.tag=${IMAGE_TAG} \\
+                  --set ingress.enabled=true \\
+                  --set ingress.hosts[0].host=exchange-generator.test.local \\
+                  --set ingress.hosts[0].paths[0].path="/" \\
+                  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
                 """
             }
         }
@@ -272,6 +287,15 @@ pipeline {
                   --set image.tag=${IMAGE_TAG} \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=exchange.prod.local \\
+                  --set ingress.hosts[0].paths[0].path="/" \\
+                  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+
+                helm upgrade --install exchange-generator-service my-microservices-app/charts/exchange-generator-service \\
+                  --namespace prod --create-namespace \\
+                  --set image.repository=exchange-generator-service \\
+                  --set image.tag=${IMAGE_TAG} \\
+                  --set ingress.enabled=true \\
+                  --set ingress.hosts[0].host=exchange-generator.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
                 """
