@@ -55,11 +55,6 @@ spec:
             - configMapRef:
                 name: {{ include "exchange-generator-service.fullname" . }}
           env:
-            - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-exchange-generator-db
-                  key: password
             - name: SPRING_PROFILES_ACTIVE
               value: "kube"
       {{- with .Values.nodeSelector }}
