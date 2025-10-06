@@ -26,6 +26,11 @@ dependencies:
     version: "0.1.0"
     repository: "file://./charts/exchange-service"  # Local path reference
 
+  # Subchart for Exchange Generator Service
+  - name: exchange-generator-service
+    version: "0.1.0"
+    repository: "file://./charts/exchange-generator-service"  # Local path reference
+
   # Subchart for Order Service
   - name: order-service
     version: "0.1.0"

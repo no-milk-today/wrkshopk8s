@@ -103,6 +103,24 @@ exchange-service:
     # database_password_secret: "{{ .Release.Name }}-exchange-db-postgresql"
     # database_password_secret_key: "postgresql-password"
 
+exchange-generator-service:
+  replicaCount: 1
+  image:
+    repository: exchange-generator-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8087
+  ingress:
+    enabled: true
+    className: "nginx"
+    hosts:
+      - host: exchange-generator.myapp.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+
 # Configuration for the order-service subchart
 # NOTE: Build image locally: `docker build -t order-service:latest in order-service dir
 order-service:
