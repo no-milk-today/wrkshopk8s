@@ -17,12 +17,12 @@ spring:
             scope: openid,profile,email
         provider:
           keycloak:
-            issuer-uri: http://localhost:8090/realms/bank-realm
+            issuer-uri: ${KEYCLOAK_ISSUER_URL:http://localhost:8090/realms/bank-realm}
 
 # ─── Keycloak admin-client (service account front-ui-admin) ──────────────────────
 keycloak:
   admin:
-    server-url:  http://localhost:8090
+    server-url:  ${KEYCLOAK_SERVER_URL:http://localhost:8090}
     realm:       bank-realm
     client-id:   front-ui-admin
     client-secret: front-ui-admin-secret
