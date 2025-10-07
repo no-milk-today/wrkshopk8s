@@ -121,6 +121,24 @@ exchange-generator-service:
           - path: /
             pathType: ImplementationSpecific
 
+front-ui-service:
+  replicaCount: 1
+  image:
+    repository: front-ui-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8085
+  ingress:
+    enabled: true
+    className: "nginx"
+    hosts:
+      - host: front-ui.myapp.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+
 # Configuration for the order-service subchart
 # NOTE: Build image locally: `docker build -t order-service:latest in order-service dir
 order-service:

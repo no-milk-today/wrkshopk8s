@@ -44,6 +44,11 @@ pipeline {
                         sh 'mvn -pl exchange-generator-service -am clean test'
                     }
                 }
+                stage('FrontUI Service') {
+                    steps {
+                        sh 'mvn -pl front-ui-service -am clean test'
+                    }
+                }
             }
         }
 
@@ -56,6 +61,7 @@ pipeline {
                 docker build -t order-service:${IMAGE_TAG} -f order-service/Dockerfile .
                 docker build -t exchange-service:${IMAGE_TAG} -f exchange-service/Dockerfile .
                 docker build -t exchange-generator-service:${IMAGE_TAG} -f exchange-generator-service/Dockerfile .
+                docker build -t front-ui-service:${IMAGE_TAG} -f front-ui-service/Dockerfile .
                 """
             }
         }
@@ -179,6 +185,15 @@ pipeline {
 //                   --set ingress.hosts[0].host=exchange-generator.test.local \\
 //                   --set ingress.hosts[0].paths[0].path="/" \\
 //                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+//
+//                 helm upgrade --install front-ui-service my-microservices-app/charts/front-ui-service \\
+//                   --namespace test --create-namespace \\
+//                   --set image.repository=front-ui-service \\
+//                   --set image.tag=${IMAGE_TAG} \\
+//                   --set ingress.enabled=true \\
+//                   --set ingress.hosts[0].host=front-ui.test.local \\
+//                   --set ingress.hosts[0].paths[0].path="/" \\
+//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
 //                 """
 //             }
 //         }
@@ -296,6 +311,15 @@ pipeline {
                   --set image.tag=${IMAGE_TAG} \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=exchange-generator.prod.local \\
+                  --set ingress.hosts[0].paths[0].path="/" \\
+                  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+
+                helm upgrade --install front-ui-service my-microservices-app/charts/front-ui-service \\
+                  --namespace prod --create-namespace \\
+                  --set image.repository=front-ui-service \\
+                  --set image.tag=${IMAGE_TAG} \\
+                  --set ingress.enabled=true \\
+                  --set ingress.hosts[0].host=front-ui.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
                 """
