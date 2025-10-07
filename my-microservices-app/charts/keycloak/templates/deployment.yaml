@@ -42,7 +42,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           envFrom:
             - configMapRef:
-                name: {{ include "keycloak.fullname" . }}
+                name: {{ include "keycloak.fullname" . }}-realm-config  # Use the correct name
           env:
             - name: KC_BOOTSTRAP_ADMIN_USERNAME
               value: {{ .Values.env.adminUser }}
