@@ -36,6 +36,11 @@ dependencies:
     version: "0.1.0"
     repository: "file://./charts/front-ui-service"  # Local path reference
 
+  # Subchart for Keycloak
+  - name: keycloak
+    version: "0.1.0"
+    repository: "file://./charts/keycloak"  # Local path reference
+
   # Subchart for Order Service
   - name: order-service
     version: "0.1.0"

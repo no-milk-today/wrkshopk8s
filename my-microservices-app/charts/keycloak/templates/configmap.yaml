@@ -1,0 +1,11 @@
+{{- if .Values.configMap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "keycloak.fullname" . }}-realm-config
+  labels:
+    {{- include "keycloak.labels" . | nindent 4 }}
+data:
+  realm-export.json: |
+{{- .Files.Get "keycloak/config/realm-export.json" | nindent 4 }}
+{{- end }}
