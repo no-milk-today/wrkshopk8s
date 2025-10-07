@@ -2,27 +2,27 @@ FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 COPY pom.xml .
+COPY front-ui-service/pom.xml front-ui-service/pom.xml
+COPY exchange-generator-service/pom.xml exchange-generator-service/pom.xml
 COPY notification-service/pom.xml notification-service/pom.xml
 COPY fraud-service/pom.xml fraud-service/pom.xml
 COPY customer-service/pom.xml customer-service/pom.xml
 COPY order-service/pom.xml order-service/pom.xml
 COPY exchange-service/pom.xml exchange-service/pom.xml
-COPY exchange-generator-service/pom.xml exchange-generator-service/pom.xml
-COPY front-ui-service/pom.xml front-ui-service/pom.xml
 COPY clients/pom.xml clients/pom.xml
 
-RUN mvn -B -pl notification-service -am dependency:go-offline
+RUN mvn -B -pl front-ui-service -am dependency:go-offline
 
 COPY . .
 
-RUN mvn -B -pl notification-service -am package -DskipTests
+RUN mvn -B -pl front-ui-service -am package -DskipTests
 
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=build /app/notification-service/target/notification-service-*.jar app.jar
+COPY --from=build /app/front-ui-service/target/front-ui-service-*.jar app.jar
 
-EXPOSE 8083
+EXPOSE 8085
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -12,6 +12,7 @@
         <module name="exchange-generator-service" />
         <module name="exchange-service" />
         <module name="customer-service" />
+        <module name="front-ui-service" />
         <module name="order-service" />
         <module name="notification-service" />
       </profile>

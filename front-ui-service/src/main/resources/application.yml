@@ -1,0 +1,68 @@
+server:
+  port: 8085
+  forward-headers-strategy: native
+  # When the application is running behind a gateway (Spring Cloud Gateway, NGINX),
+  # forward-headers-strategy: native ensures that forwarded headers (X-Forwarded-Host, X-Forwarded-Port, X-Forwarded-Proto) are properly handled
+  # to maintain correct redirect URIs and other forwarded information
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: front-ui
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid,profile,email
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8090/realms/bank-realm
+
+# ─── Keycloak admin-client (service account front-ui-admin) ──────────────────────
+keycloak:
+  admin:
+    server-url:  http://localhost:8090
+    realm:       bank-realm
+    client-id:   front-ui-admin
+    client-secret: front-ui-admin-secret
+
+# Spring Boot Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      customer-client:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      exchange-client:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      transfer-client:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  retry:
+    instances:
+      customer-client:
+        maxAttempts: 3
+        waitDuration: 500ms
+      exchange-client:
+        maxAttempts: 3
+        waitDuration: 500ms
+      transfer-client:
+        maxAttempts: 3
+        waitDuration: 500ms
