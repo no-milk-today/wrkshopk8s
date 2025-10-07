@@ -33,7 +33,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["start-dev", "--import-realm"]
+          command: [ "/opt/keycloak/bin/kc.sh", "start-dev", "--import-realm" ]
           ports:
             - name: http
               containerPort: {{ .Values.service.port }} # Use the service port value from values.yaml
