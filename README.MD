@@ -2,6 +2,16 @@
 
 This project is composed of multiple microservices using the Netflix stack (~~Eureka~~, Feign, Resilience4j) with Spring Boot and Maven.
 
+## add these lines into etc/hosts file
+127.0.0.1 customer.test.local
+127.0.0.1 order.test.local
+127.0.0.1 customer.prod.local
+127.0.0.1 order.prod.local
+127.0.0.1 fraud.prod.local
+127.0.0.1 notification.prod.local
+127.0.0.1 front-ui.prod.local
+127.0.0.1 keycloak.prod.local
+
 ## Modules
 
 - **Customer**  
