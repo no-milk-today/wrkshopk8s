@@ -1,0 +1,150 @@
+{
+  "realm": "bank-realm",
+  "enabled": true,
+  "defaultRoles": ["ROLE_USER"],
+
+  "roles": {
+    "realm": [
+      { "name": "ROLE_USER",               "description": "End-user role" },
+      { "name": "ROLE_CUSTOMER_SERVICE",   "description": "Customer microservice access" },
+      { "name": "ROLE_EXCHANGE_SERVICE",   "description": "Exchange microservice access" },
+      { "name": "ROLE_NOTIFICATION_SERVICE","description": "Notification microservice access" },
+      { "name": "ROLE_FRAUD_SERVICE",      "description": "Fraud microservice access" },
+      { "name": "ROLE_CASH_SERVICE",       "description": "Cash microservice access" },
+      { "name": "ROLE_GATEWAY",            "description": "API Gateway" }
+    ]
+  },
+
+  "clients": [
+    {
+      "clientId": "front-ui",
+      "name": "Front-UI SPA / MVC",
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "redirectUris": [
+        "http://localhost:8085/*",
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8085",
+        "http://localhost:8080"
+      ],
+      "rootUrl": "http://localhost:8085",
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:8080/*"
+      },
+      "defaultClientScopes": ["profile", "email", "roles"]
+    },
+    {
+      "clientId": "apigateway",
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "secret": "apigateway-secret",
+      "redirectUris": [ ],
+      "defaultClientScopes": [ "roles" ],
+      "attributes": {
+        "post.logout.redirect.uris": "+"
+      }
+    },
+    {
+      "clientId": "customer",
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "secret": "customer-secret",
+      "defaultClientScopes": [ "roles" ]
+    },
+    {
+      "clientId": "exchange",
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "secret": "exchange-secret",
+      "defaultClientScopes": [ "roles" ]
+    },
+    {
+      "clientId": "notification",
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "secret": "notification-secret",
+      "defaultClientScopes": [ "roles" ]
+    },
+    {
+      "clientId": "fraud",
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "secret": "fraud-secret",
+      "defaultClientScopes": [ "roles" ]
+    },
+    {
+      "clientId": "front-ui-admin",
+      "name": "Front-UI Admin Client",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "secret": "front-ui-admin-secret",
+      "redirectUris": [],
+      "defaultRoles": [],
+      "attributes": {
+        "client_credentials.use_refresh_token": "false",
+        "realm_client": "false",
+        "post.logout.redirect.uris": "+"
+      },
+      "defaultClientScopes": [
+        "service_account",
+        "roles"
+      ],
+      "enabled": true,
+      "surrogateAuthRequired": false,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "frontchannelLogout": false,
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "optionalClientScopes": [],
+      "access": {
+        "view": true,
+        "configure": true,
+        "manage": true
+      },
+      "authenticationFlowBindingOverrides": {},
+      "notBefore": 0,
+      "webOrigins": []
+    },
+    {
+      "clientId": "cash",
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "secret": "cash-secret",
+      "defaultClientScopes": [
+        "roles"
+      ]
+    }
+  ],
+  "groups": [],
+  "users": [
+    {
+      "username": "service-account-front-ui-admin",
+      "enabled": true,
+      "serviceAccountClientId": "front-ui-admin",
+      "realmRoles": [
+        "ROLE_USER"
+      ],
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users"
+        ]
+      }
+    }
+  ]
+}
