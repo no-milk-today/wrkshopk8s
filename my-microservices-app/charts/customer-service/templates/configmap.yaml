@@ -22,4 +22,5 @@ data:
   # SPRING_DATASOURCE_PASSWORD would typically come from a secret, not this ConfigMap.
 
   # Example: Include other config defined in values.yaml
-  # OTHER_CONFIG_PARAM: {{ .Values.config.some_other_config | quote }} 
+  # OTHER_CONFIG_PARAM: {{ .Values.config.some_other_config | quote }}
+  KEYCLOAK_ISSUER_URL: {{ .Values.config.keycloak_issuer_url | quote }}

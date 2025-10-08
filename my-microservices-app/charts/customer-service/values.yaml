@@ -81,3 +81,4 @@ affinity: {}
 config:
   database_url: "jdbc:postgresql://postgres-postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/mydb"
   database_username: "myuser"
+  keycloak_issuer_url: "http://keycloak.prod.local:8080/realms/bank-realm"
