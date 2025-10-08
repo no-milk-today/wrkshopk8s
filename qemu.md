@@ -139,7 +139,7 @@ http://customer.myapp.local/actuator/health
 
 ### Настройка CI/CD через Jenkins
 
-1) см. файл [README.md](README.md)
+1) см. файл [README.md](README_CICD.md)
 
 2) Убедитесь, что в .env указаны ваши значения из github
 Для полей GHCR_TOKEN и GITHUB_TOKEN нужно сгенерить токен в github
