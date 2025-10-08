@@ -9,3 +9,6 @@ data:
   {{- range $key, $value := .Values.config }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
+
+  KEYCLOAK_ISSUER_URL: {{ .Values.config.keycloak_issuer_url | quote }}
+  KEYCLOAK_SERVER_URL: {{ .Values.config.keycloak_server_url | quote }}
