@@ -37,8 +37,8 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: ClusterIP
-  port: 8090 # Default port, overridden by umbrella
+  type: NodePort
+  port: 8080 # Default port, overridden by umbrella
 
 ingress:
   enabled: true
