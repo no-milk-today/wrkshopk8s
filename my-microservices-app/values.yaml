@@ -138,6 +138,9 @@ front-ui-service:
         paths:
           - path: /
             pathType: ImplementationSpecific
+  config:
+    keycloak_issuer_url: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+    keycloak_server_url: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080"
 
 keycloak:
   replicaCount: 1
