@@ -7,5 +7,5 @@ metadata:
     {{- include "keycloak.labels" . | nindent 4 }}
 data:
   realm-export.json: |
-{{- .Files.Get "keycloak/config/realm-export.json" | nindent 4 }}
+{{- .Files.Get "config/realm-export.json" | nindent 4 }}
 {{- end }}
