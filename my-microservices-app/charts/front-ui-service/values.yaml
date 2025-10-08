@@ -77,5 +77,5 @@ tolerations: []
 affinity: {}
 
 config:
-  keycloak_issuer_url: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
-  keycloak_server_url: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080"
+  KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+  KEYCLOAK_SERVER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080"
