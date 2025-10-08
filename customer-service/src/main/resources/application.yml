@@ -27,7 +27,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${DDL_AUTO_MODE:update}
     show-sql: true
     properties:
       hibernate:

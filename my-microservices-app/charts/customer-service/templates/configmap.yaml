@@ -24,3 +24,4 @@ data:
   # Example: Include other config defined in values.yaml
   # OTHER_CONFIG_PARAM: {{ .Values.config.some_other_config | quote }}
   KEYCLOAK_ISSUER_URL: {{ .Values.config.keycloak_issuer_url | quote }}
+  DDL_AUTO_MODE: {{ .Values.config.ddl_auto_mode | quote }}
