@@ -7,7 +7,7 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: 8090  # external port
+    - port: {{ .Values.service.port }}
       targetPort: http # Match the container port *name* in the deployment
       protocol: TCP
       name: http

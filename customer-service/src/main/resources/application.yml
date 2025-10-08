@@ -15,6 +15,11 @@ management:
 
 # Datasource Configuration (reads from environment variables set by Helm ConfigMap/Secrets)
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URL:http://localhost:8090/realms/bank-realm}
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/customer}
     username: ${SPRING_DATASOURCE_USERNAME:customer_user} # Password should be provided via SPRING_DATASOURCE_PASSWORD environment variable (ideally from a Secret)

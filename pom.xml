@@ -19,6 +19,7 @@
         <module>exchange-service</module>
         <module>exchange-generator-service</module>
         <module>front-ui-service</module>
+        <module>apigw</module>
         <module>clients</module>
     </modules>
 
