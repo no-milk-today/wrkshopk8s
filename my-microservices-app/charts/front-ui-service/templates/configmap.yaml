@@ -5,10 +5,6 @@ metadata:
   labels:
     {{- include "front-ui-service.labels" . | nindent 4 }}
 data:
-  # Generic key-value pairs from .Values.config
   {{- range $key, $value := .Values.config }}
-  {{ $key }}: {{ $value | quote }}
+  {{ $key }}: {{ tpl ($value | toString) $ | quote }}
   {{- end }}
-
-  KEYCLOAK_ISSUER_URL: {{ .Values.config.keycloak_issuer_url | quote }}
-  KEYCLOAK_SERVER_URL: {{ .Values.config.keycloak_server_url | quote }}
