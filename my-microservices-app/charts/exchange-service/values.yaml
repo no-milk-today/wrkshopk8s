@@ -79,4 +79,4 @@ affinity: {}
 config:
   database_url: "jdbc:postgresql://postgres-postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/mydb"
   database_username: "myuser"
-  ddl_auto_mode: "update"
+  DDL_AUTO_MODE: "update"
