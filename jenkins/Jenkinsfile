@@ -12,43 +12,8 @@ pipeline {
 
     stages {
         stage('Build & Unit Tests') {
-            parallel {
-                stage('Customer Service') {
-                    steps {
-                        // run from / so that parent pom and modules are visible
-                        sh 'mvn -pl customer-service -am clean test'
-                    }
-                }
-                stage('Order Service') {
-                    steps {
-                        sh 'mvn -pl order-service -am clean test'
-                    }
-                }
-                stage('Fraud Service') {
-                    steps {
-                        sh 'mvn -pl fraud-service -am clean test'
-                    }
-                }
-                stage('Notification Service') {
-                    steps {
-                        sh 'mvn -pl notification-service -am clean test'
-                    }
-                }
-                stage('Exchange Service') {
-                    steps {
-                        sh 'mvn -pl exchange-service -am clean test'
-                    }
-                }
-                stage('Exchange Generator Service') {
-                    steps {
-                        sh 'mvn -pl exchange-generator-service -am clean test'
-                    }
-                }
-                stage('FrontUI Service') {
-                    steps {
-                        sh 'mvn -pl front-ui-service -am clean test'
-                    }
-                }
+            steps {
+                sh 'mvn -T 1C clean test'  // T - parallel also
             }
         }
 
