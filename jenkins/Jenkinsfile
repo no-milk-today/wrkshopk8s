@@ -10,43 +10,50 @@ pipeline {
         IMAGE_TAG       = "latest"
     }
 
+    stage('Build Common Dependencies') {
+        steps {
+            // Сначала собираем parent и clients ОДИН РАЗ
+            sh 'mvn clean install -DskipTests -pl clients'
+        }
+    }
+
     stages {
         stage('Build & Unit Tests') {
             parallel {
                 stage('Customer Service') {
                     steps {
                         // run from / so that parent pom and modules are visible
-                        sh 'mvn -pl customer-service -am clean test'
+                        sh 'mvn -pl customer-service clean test'
                     }
                 }
                 stage('Order Service') {
                     steps {
-                        sh 'mvn -pl order-service -am clean test'
+                        sh 'mvn -pl order-service clean test'
                     }
                 }
                 stage('Fraud Service') {
                     steps {
-                        sh 'mvn -pl fraud-service -am clean test'
+                        sh 'mvn -pl fraud-service clean test'
                     }
                 }
                 stage('Notification Service') {
                     steps {
-                        sh 'mvn -pl notification-service -am clean test'
+                        sh 'mvn -pl notification-service clean test'
                     }
                 }
                 stage('Exchange Service') {
                     steps {
-                        sh 'mvn -pl exchange-service -am clean test'
+                        sh 'mvn -pl exchange-service clean test'
                     }
                 }
                 stage('Exchange Generator Service') {
                     steps {
-                        sh 'mvn -pl exchange-generator-service -am clean test'
+                        sh 'mvn -pl exchange-generator-service clean test'
                     }
                 }
                 stage('FrontUI Service') {
                     steps {
-                        sh 'mvn -pl front-ui-service -am clean test'
+                        sh 'mvn -pl front-ui-service clean test'
                     }
                 }
             }
