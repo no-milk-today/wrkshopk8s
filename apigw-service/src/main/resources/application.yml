@@ -11,23 +11,19 @@ spring:
         - PreserveHostHeader
       routes:
         - id: customer
-          uri: http://localhost:8081
+          uri: ${CUSTOMER_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/api/v1/customers/**
         - id: front-ui
-          uri: http://localhost:8085
+          uri: ${FRONT_UI_SERVICE_URL:http://localhost:8085}
           predicates:
             - Path=/main/**, /, /signup/**, /user/**, /css/**, /js/**, /webjars/**, /favicon.ico, /images/**, /oauth2/authorization/**, /login/oauth2/code/**, /logout
-          filters:  # ← добавить фильтры для этого роута (чтобы корректно работали редиректы)
-            - AddRequestHeader=X-Forwarded-Proto, http
-            - AddRequestHeader=X-Forwarded-Host, localhost:8080
-            - AddRequestHeader=X-Forwarded-Port, 8080
         - id: exchange
-          uri: http://localhost:8086
+          uri: ${EXCHANGE_SERVICE_URL:http://localhost:8086}
           predicates:
             - Path=/api/rates/**
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8090/realms/bank-realm
+          issuer-uri: ${KEYCLOAK_ISSUER_URL:http://localhost:8090/realms/bank-realm}
