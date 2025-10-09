@@ -102,6 +102,7 @@ exchange-service:
   config:
     database_url: "jdbc:postgresql://{{ .Release.Name }}-exchange-db:5432/exchangedb"
     database_username: "exchange_user"
+    ddl_auto_mode: "update"
     # database_password_secret: "{{ .Release.Name }}-exchange-db-postgresql"
     # database_password_secret_key: "postgresql-password"
 
