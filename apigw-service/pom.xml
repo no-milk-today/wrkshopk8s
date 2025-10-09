@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <packaging>jar</packaging>
-    <artifactId>apigw</artifactId>
-    <name>apigw</name>
+    <artifactId>apigw-service</artifactId>
+    <name>apigw-service</name>
 
     <build>
         <plugins>

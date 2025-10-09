@@ -8,16 +8,19 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="fraud-service" />
-        <module name="apigw" />
         <module name="clients" />
         <module name="exchange-generator-service" />
         <module name="exchange-service" />
         <module name="customer-service" />
         <module name="front-ui-service" />
         <module name="order-service" />
+        <module name="apigw-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="apigw" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
