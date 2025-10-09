@@ -23,6 +23,7 @@ for ns in test prod; do
   helm uninstall exchange-generator-service -n "$ns" || true
   helm uninstall exchange-service -n "$ns" || true
   helm uninstall customer-service -n "$ns" || true
+  helm uninstall apigw-service -n "$ns" || true
   helm uninstall order-service -n "$ns" || true
   helm uninstall postgres -n "$ns" || true
 done
@@ -52,6 +53,7 @@ docker image rm notification-service:latest || true
 docker image rm exchange-service:latest || true
 docker image rm exchange-generator-service:latest || true
 docker image rm front-ui-service:latest || true
+docker image rm apigw-service:latest || true
 docker image rm order-service:latest || true
 docker image rm jenkins-jenkins:latest || true
 

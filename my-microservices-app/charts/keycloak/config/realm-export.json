@@ -23,15 +23,15 @@
       "publicClient": true,
       "redirectUris": [
         "http://front-ui.prod.local/*",
-        "http://localhost:8080/*"
+        "http://apigw.prod.local/*"
       ],
       "webOrigins": [
         "http://front-ui.prod.local/*",
-        "http://localhost:8080"
+        "http://apigw.prod.local/*"
       ],
       "rootUrl": "http://front-ui.prod.local",
       "attributes": {
-        "post.logout.redirect.uris": "http://localhost:8080/*"
+        "post.logout.redirect.uris": "http://apigw.prod.local/*"
       },
       "defaultClientScopes": ["profile", "email", "roles"]
     },

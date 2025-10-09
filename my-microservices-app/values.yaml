@@ -194,6 +194,26 @@ order-service:
     # database_password_secret: "{{ .Release.Name }}-order-db-postgresql"
     # database_password_secret_key: "postgresql-password"
 
+apigw-service:
+  replicaCount: 1
+  image:
+    repository: apigw-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+  ingress:
+    enabled: true
+    className: "nginx"
+    hosts:
+      - host: apigw.myapp.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+  config:
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+
 # Configuration for the customer-db (PostgreSQL dependency)
 # Values here are prefixed according to the Bitnami PostgreSQL chart's structure
 # Check the Bitnami chart's values.yaml for all available options

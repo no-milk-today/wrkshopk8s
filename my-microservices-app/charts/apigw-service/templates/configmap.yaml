@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "apigw-service.fullname" . }}
+  labels:
+    {{- include "apigw-service.labels" . | nindent 4 }}
+data:
+  {{- range $key, $value := .Values.config }}
+  {{ $key }}: {{ tpl ($value | toString) $ | quote }}
+  {{- end }}

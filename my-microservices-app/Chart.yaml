@@ -41,6 +41,11 @@ dependencies:
     version: "0.1.0"
     repository: "file://./charts/keycloak"  # Local path reference
 
+  # Subchart for API Gateway Service
+  - name: apigw-service
+    version: "0.1.0"
+    repository: "file://./charts/apigw-service"  # Local path reference
+
   # Subchart for Order Service
   - name: order-service
     version: "0.1.0"
