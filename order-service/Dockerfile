@@ -9,7 +9,7 @@ COPY notification-service/pom.xml notification-service/pom.xml
 COPY exchange-service/pom.xml exchange-service/pom.xml
 COPY exchange-generator-service/pom.xml exchange-generator-service/pom.xml
 COPY front-ui-service/pom.xml front-ui-service/pom.xml
-COPY apigw/pom.xml apigw/pom.xml
+COPY apigw-service/pom.xml apigw-service/pom.xml
 COPY clients/pom.xml clients/pom.xml
 
 RUN mvn -B -pl order-service -am dependency:go-offline
