@@ -33,6 +33,8 @@ customer-service:
     database_username: "customer_user"
     # database_password_secret: "{{ .Release.Name }}-customer-db-postgresql" # Reference to secret created by DB chart
     # database_password_secret_key: "postgresql-password" # Key within the secret
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+    DDL_AUTO_MODE: "update"
 
 fraud-service:
   replicaCount: 1
