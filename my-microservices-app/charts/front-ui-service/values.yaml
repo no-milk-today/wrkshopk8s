@@ -77,5 +77,8 @@ tolerations: []
 affinity: {}
 
 config:
-  KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+  KEYCLOAK_AUTH_URI: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm/protocol/openid-connect/auth"
+  KEYCLOAK_TOKEN_URI: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm/protocol/openid-connect/token"
+  KEYCLOAK_USERINFO_URI: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm/protocol/openid-connect/userinfo"
+  KEYCLOAK_JWK_SET_URI: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm/protocol/openid-connect/certs"
   KEYCLOAK_SERVER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080"

@@ -17,7 +17,13 @@ spring:
             scope: openid,profile,email
         provider:
           keycloak:
-            issuer-uri: ${KEYCLOAK_ISSUER_URL:http://localhost:8090/realms/bank-realm}
+            # Browser-facing authorization endpoint (external hostname)
+            authorization-uri: ${KEYCLOAK_AUTH_URI:http://localhost:8090/realms/bank-realm/protocol/openid-connect/auth}
+            # Server-to-server endpoints (internal k8s DNS)
+            token-uri: ${KEYCLOAK_TOKEN_URI:http://localhost:8090/realms/bank-realm/protocol/openid-connect/token}
+            user-info-uri: ${KEYCLOAK_USERINFO_URI:http://localhost:8090/realms/bank-realm/protocol/openid-connect/userinfo}
+            jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8090/realms/bank-realm/protocol/openid-connect/certs}
+            user-name-attribute: preferred_username
 
 # ─── Keycloak admin-client (service account front-ui-admin) ──────────────────────
 keycloak:
