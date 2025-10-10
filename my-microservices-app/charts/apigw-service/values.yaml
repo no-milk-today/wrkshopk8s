@@ -78,3 +78,6 @@ affinity: {}
 
 config:
   KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+  CUSTOMER_SERVICE_URL: "http://customer-service.{{ .Release.Namespace }}.svc.cluster.local:8081"
+  FRONT_UI_SERVICE_URL: "http://front-ui-service.{{ .Release.Namespace }}.svc.cluster.local:8085"
+  EXCHANGE_SERVICE_URL: "http://exchange-service.{{ .Release.Namespace }}.svc.cluster.local:8086"
