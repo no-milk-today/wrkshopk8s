@@ -67,12 +67,6 @@ env:
   adminUser: admin
   adminPassword: admin
 
-config:
-  KC_HOSTNAME: keycloak.prod.local
-  KC_HOSTNAME_STRICT: "false"
-  KC_HTTP_ENABLED: "true"
-  KC_PROXY: edge
-
 # Configuration for realm import
 realmImport:
   enabled: true

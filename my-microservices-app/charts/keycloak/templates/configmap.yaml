@@ -6,9 +6,6 @@ metadata:
   labels:
     {{- include "keycloak.labels" . | nindent 4 }}
 data:
-  {{- range $key, $value := .Values.config }}
-  {{ $key }}: {{ tpl ($value | toString) $ | quote }}
-  {{- end }}
   realm-export.json: |
 {{- .Files.Get "config/realm-export.json" | nindent 4 }}
 {{- end }}

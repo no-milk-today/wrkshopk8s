@@ -165,11 +165,6 @@ keycloak:
   env:
     adminUser: admin
     adminPassword: admin
-  config:
-    KC_HOSTNAME: keycloak.prod.local
-    KC_HOSTNAME_STRICT: "false"
-    KC_HTTP_ENABLED: "true"
-    KC_PROXY: edge
 
 # Configuration for the order-service subchart
 # NOTE: Build image locally: `docker build -t order-service:latest in order-service dir
