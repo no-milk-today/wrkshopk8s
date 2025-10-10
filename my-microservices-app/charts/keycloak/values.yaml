@@ -66,6 +66,10 @@ resources: {}
 env:
   adminUser: admin
   adminPassword: admin
+  hostname: keycloak.prod.local
+  hostnameStrict: false
+  proxy: edge
+  httpEnabled: true
 
 # Configuration for realm import
 realmImport:
