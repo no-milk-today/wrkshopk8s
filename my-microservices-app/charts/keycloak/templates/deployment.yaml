@@ -52,10 +52,16 @@ spec:
               value: {{ .Values.env.hostname | quote }}
             - name: KC_HOSTNAME_STRICT
               value: {{ .Values.env.hostnameStrict | quote }}
+            - name: KC_HOSTNAME_PORT
+              value: {{ .Values.env.hostnamePort | quote }}
             - name: KC_PROXY
               value: {{ .Values.env.proxy | quote }}
             - name: KC_HTTP_ENABLED
               value: {{ .Values.env.httpEnabled | quote }}
+            - name: KC_HOSTNAME_BACKCHANNEL_DYNAMIC
+              value: {{ .Values.env.hostnameBackDynamic | quote }}
+            - name: KC_PROXY_HEADERS
+              value: {{ .Values.env.proxyHeaders | quote }}
           volumeMounts:
             - name: keycloak-config
               mountPath: /opt/keycloak/data/import

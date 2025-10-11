@@ -81,5 +81,5 @@ affinity: {}
 config:
   database_url: "jdbc:postgresql://postgres-postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/mydb"
   database_username: "myuser"
-  KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+  KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
   DDL_AUTO_MODE: "update"

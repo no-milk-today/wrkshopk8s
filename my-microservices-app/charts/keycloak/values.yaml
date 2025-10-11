@@ -43,7 +43,10 @@ service:
 ingress:
   enabled: true
   className: "nginx"
-  annotations: {}
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/proxy-headers: "X-Forwarded-Proto, X-Forwarded-For"
   hosts:
     - host: keycloak.test.local
       paths:
@@ -66,10 +69,13 @@ resources: {}
 env:
   adminUser: admin
   adminPassword: admin
-  hostname: keycloak.prod.local
+  hostname: http://keycloak.prod.local
   hostnameStrict: false
+  hostnamePort: "-1"
   proxy: edge
   httpEnabled: true
+  hostnameBackDynamic: true
+  proxyHeaders: xforwarded
 
 # Configuration for realm import
 realmImport:
