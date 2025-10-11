@@ -223,7 +223,7 @@ pipeline {
             }
         }
 
-        stage('Helm Deploy to PROD') {
+        stage('Deploy Keycloak to PROD') {
             steps {
                 sh """
                 helm upgrade --install keycloak my-microservices-app/charts/keycloak \\
@@ -234,7 +234,22 @@ pipeline {
                   --set ingress.hosts[0].host=keycloak.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+                """
+            }
+        }
 
+        stage('Wait for Keycloak Ready') {
+            steps {
+                sh """
+                kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=keycloak \
+                  -n prod --timeout=300s
+                """
+            }
+        }
+
+        stage('Helm Deploy to PROD') {
+            steps {
+                sh """
                 helm upgrade --install customer-service my-microservices-app/charts/customer-service \\
                   --namespace prod --create-namespace \\
                   --set image.repository=customer-service \\
