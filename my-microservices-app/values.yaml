@@ -33,7 +33,7 @@ customer-service:
     database_username: "customer_user"
     # database_password_secret: "{{ .Release.Name }}-customer-db-postgresql" # Reference to secret created by DB chart
     # database_password_secret_key: "postgresql-password" # Key within the secret
-    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
     DDL_AUTO_MODE: "update"
 
 fraud-service:
@@ -142,9 +142,7 @@ front-ui-service:
           - path: /
             pathType: ImplementationSpecific
   config:
-    # Публичный URL для браузерных редиректов
-    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
-    # Для admin-client можно использовать внутренний URL
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
     KEYCLOAK_SERVER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080"
 
 keycloak:
@@ -171,13 +169,11 @@ keycloak:
   env:
     adminUser: admin
     adminPassword: admin
-    hostname: http://keycloak.prod.local   # Публичный URL
-    hostnameStrict: false                  # Разрешает flexible hostname
-    hostnamePort: "-1"                     # Отключает добавление порта
-    proxy: edge                            # Работает за NGINX Ingress
-    httpEnabled: true                      # HTTP режим
-    hostnameBackDynamic: true              # Ключевая настройка!
-    proxyHeaders: xforwarded               # Читает X-Forwarded-* headers
+    hostname: keycloak.prod.local
+    hostnameStrict: false
+    proxy: edge
+    httpEnabled: true
+    proxyHeaders: xforwarded
 
 # Configuration for the order-service subchart
 # NOTE: Build image locally: `docker build -t order-service:latest in order-service dir
@@ -225,7 +221,7 @@ apigw-service:
           - path: /
             pathType: ImplementationSpecific
   config:
-    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
     CUSTOMER_SERVICE_URL: "http://customer-service.{{ .Release.Namespace }}.svc.cluster.local:8081"
     FRONT_UI_SERVICE_URL: "http://front-ui-service.{{ .Release.Namespace }}.svc.cluster.local:8085"
     EXCHANGE_SERVICE_URL: "http://exchange-service.{{ .Release.Namespace }}.svc.cluster.local:8086"

@@ -69,12 +69,10 @@ resources: {}
 env:
   adminUser: admin
   adminPassword: admin
-  hostname: http://keycloak.prod.local
+  hostname: keycloak.prod.local
   hostnameStrict: false
-  hostnamePort: "-1"
   proxy: edge
   httpEnabled: true
-  hostnameBackDynamic: true
   proxyHeaders: xforwarded
 
 # Configuration for realm import
