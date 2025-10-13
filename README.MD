@@ -277,9 +277,9 @@ The system consists of the following microservices running on different ports (d
 ## Usage Examples
 
 ### Register a new customer (for local development)
-Replace all the 'localhost:xxxx' with '<service-name>.prod.local' for k8s deployment.
+Replace all the 'localhost:xxxx' with 'SERVICE_NAME.prod.local' for k8s deployment.
 ```bash
-POST http://localhost:8080/api/v1/customers/signup
+POST http://apigw.prod.local/signup
 Content-Type: application/json
 
 {
@@ -294,7 +294,7 @@ Content-Type: application/json
 
 ### Change user password
 ```bash
-POST http://localhost:8080/api/v1/customers/user/john/editPassword
+POST http://apigw.prod.local/api/v1/customers/user/john/editPassword
 Content-Type: application/json
 
 {
@@ -305,7 +305,7 @@ Content-Type: application/json
 
 ### Change user profile and accounts
 ```bash
-POST http://localhost:8080/api/v1/customers/user/john/editUserAccounts
+POST http://apigw.prod.local/api/v1/customers/user/john/editUserAccounts
 Content-Type: application/json
 
 {
@@ -320,7 +320,7 @@ Content-Type: application/json
 
 ### Get current exchange rates
 ```bash
-GET http://localhost:8080/api/rates
+GET http://apigw.prod.local/api/rates
 Accept: application/json
 ```
 
