@@ -244,7 +244,7 @@ pipeline {
                 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=keycloak \
                   -n prod --timeout=300s
 
-                sh 'sleep 90'
+                sleep 90
                 """
             }
         }
