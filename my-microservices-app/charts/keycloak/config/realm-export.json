@@ -22,14 +22,12 @@
       "protocol": "openid-connect",
       "publicClient": true,
       "redirectUris": [
-        "http://front-ui.prod.local/*",
         "http://apigw.prod.local/*"
       ],
       "webOrigins": [
-        "http://front-ui.prod.local/*",
         "http://apigw.prod.local/*"
       ],
-      "rootUrl": "http://front-ui.prod.local",
+      "rootUrl": "http://apigw.prod.local",
       "attributes": {
         "post.logout.redirect.uris": "http://apigw.prod.local/*"
       },
