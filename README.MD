@@ -1,21 +1,39 @@
 # Bank Microservices Project
 
 This project is composed of multiple microservices using the Netflix stack (~~Eureka~~, Feign, Resilience4j) with Spring Boot and Maven.
+## Jenkins + Docker + Kubernetes + Helm
+The project automates the CI/CD process for banking microservices. It performs:
+- code build and testing;
+- Docker image building;
+- publishing images to GitHub Container Registry (GHCR);
+- deployment to a Kubernetes cluster using Helm.
 
-## add these lines into etc/hosts
+All stages are executed through Jenkins Pipeline.
+
+## Prerequisites
+To run the project, you will need add such entries to your `/etc/hosts` file
+```/etc/hosts
 127.0.0.1 customer.test.local
 127.0.0.1 customer.prod.local
+127.0.0.1 fraud.test.local
 127.0.0.1 fraud.prod.local
+127.0.0.1 notification.test.local
 127.0.0.1 notification.prod.local
+127.0.0.1 front-ui.test.local
 127.0.0.1 front-ui.prod.local
+127.0.0.1 keycloak.test.local
 127.0.0.1 keycloak.prod.local
+127.0.0.1 apigw.test.local
 127.0.0.1 apigw.prod.local
+127.0.0.1 exchange.test.local
 127.0.0.1 exchange.prod.local
 127.0.0.1 exchange-generator.prod.local
 127.0.0.1 exchange-generator.test.local
+127.0.0.1 cash.test.local
 127.0.0.1 cash.prod.local
+127.0.0.1 transfer.test.local
 127.0.0.1 transfer.prod.local
-
+```
 
 ## Modules
 
@@ -55,8 +73,9 @@ This project is composed of multiple microservices using the Netflix stack (~~Eu
 - Spring Boot
 - Spring Cloud OpenFeign, Load Balancer
 - Resilience4j (Circuit breaker and Retry)
-- Docker Desktop
-- k8s local cluster
+- Docker Desktop (with k8s), Docker Compose
+- Jenkins
+- Helm
 - PostgreSQL
 - Maven
 - Keycloak (Authorization & Authentication)
@@ -64,8 +83,8 @@ This project is composed of multiple microservices using the Netflix stack (~~Eu
 ## Security & Authentication
 
 - **Keycloak** (OIDC, port 8090 (if not k8s), realm: `bank-realm`) provides authentication and JWT tokens.
-- **Front-UI** uses Authorization Code Grant with Keycloak.
-- **API Gateway** and all backend microservices (Customer, Exchange, Notification, Fraud, Cash) are set as resource servers and validate Keycloak JWT tokens.
+- **Front-UI** uses Authorization Code Flow with Keycloak.
+- **API Gateway** and all backend microservices (Customer, Exchange, Notification, Fraud, Cash, Transfer) are set as resource servers and validate Keycloak JWT tokens.
 - Service-to-service calls use confidential Keycloak clients (service accounts) for authentication.
 - On login, user is redirected to Keycloak, receives JWT (proxied by Gateway), and all service calls are authorized. On logout, SSO session is ended via Keycloak.
 - **Just-In-Time Provisioning:** on first login, Front-UI syncs profile with Customer service.
@@ -215,24 +234,20 @@ This project is composed of multiple microservices using the Netflix stack (~~Eu
 
 ## Architecture Overview
 
-### k8s local cluster (Docker Desktop)
-- **Customer**: `customer.prod.local` - User management and accounts
+The system consists of the following microservices running on different ports (database per service is PostgreSQL):
 
-### local development
-The system consists of the following microservices running on different ports:
+- **Customer**: - User management and accounts
+- **Fraud**: - Fraud detection
+- **Notification**: - Notification handling  
+- **API Gateway**: - Request routing and load balancing
+- **Front UI**: - Web user interface
+- **Exchange**: - Currency exchange rates management
+- **Exchange Generator**: - Automatic exchange rate generation
+- **Cash**: withdrawal and deposit operations
+- **Transfer**: - Money transfers with currency conversion
 
-- **Customer**: `8081` - User management and accounts
-- **Fraud**: `8082` - Fraud detection
-- **Notification**: `8083` - Notification handling  
-- **API Gateway**: `8080` - Request routing and load balancing
-- **Front UI**: `8085` - Web user interface
-- **Exchange**: `8086` - Currency exchange rates management
-- **Exchange Generator**: `8087` - Automatic exchange rate generation
-- **Cash**: `8088` - withdrawal and deposit operations
-- **Transfer**: `8089` - Money transfers with currency conversion
-
-## Running the Project
-1. .env >> прописать свои значения для postgres (в докере)
+## Running the Project locally
+1. .env >> прописать свои значения для postgres (в докере если локально запускать)
 2. ```docker-compose up -d```.
    - **Note:** Ensure that the Keycloak server is running on port `8090` and the realm is named `bank-realm`.
    - The Keycloak server will be used for authentication and authorization.
@@ -249,9 +264,20 @@ The system consists of the following microservices running on different ports:
 6. Access the application (api-gateway) at `http://localhost:8080`. After successful login redirect to http://localhost:8080/main 
 7. Do logout (via `http://localhost:8080/logout` and create one more customer (to test transferring money between them).
 
+## Running the Project in Kubernetes
+1. Ensure you have a running Kubernetes cluster (e.g., Docker Desktop with Kubernetes enabled).
+2. Install Helm if you haven't already.
+3. Run jenkins (via docker-compose up -d --build in jenkins folder).
+4. Open Jenkins at `http://localhost:8080` and trigger the `YandexHelmApp` job to deploy the application to your Kubernetes cluster.
+5. Wait for the job to complete successfully. There is a manual approval step before deploying to production.
+6. Make sure that keycloak is running in the cluster and accessible at `http://keycloak.prod.local`.
+5. Access the application via the configured domain names (`http://apigw.prod.local/signup`).
+6. After successful login redirect to http://apigw.prod.local/main
+
 ## Usage Examples
 
-### Register a new customer
+### Register a new customer (for local development)
+Replace all the 'localhost:xxxx' with '<service-name>.prod.local' for k8s deployment.
 ```bash
 POST http://localhost:8080/api/v1/customers/signup
 Content-Type: application/json
