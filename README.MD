@@ -2,15 +2,20 @@
 
 This project is composed of multiple microservices using the Netflix stack (~~Eureka~~, Feign, Resilience4j) with Spring Boot and Maven.
 
-## add these lines into etc/hosts file
+## add these lines into etc/hosts
 127.0.0.1 customer.test.local
-127.0.0.1 order.test.local
 127.0.0.1 customer.prod.local
-127.0.0.1 order.prod.local
 127.0.0.1 fraud.prod.local
 127.0.0.1 notification.prod.local
 127.0.0.1 front-ui.prod.local
 127.0.0.1 keycloak.prod.local
+127.0.0.1 apigw.prod.local
+127.0.0.1 exchange.prod.local
+127.0.0.1 exchange-generator.prod.local
+127.0.0.1 exchange-generator.test.local
+127.0.0.1 cash.prod.local
+127.0.0.1 transfer.prod.local
+
 
 ## Modules
 
@@ -50,6 +55,8 @@ This project is composed of multiple microservices using the Netflix stack (~~Eu
 - Spring Boot
 - Spring Cloud OpenFeign, Load Balancer
 - Resilience4j (Circuit breaker and Retry)
+- Docker Desktop
+- k8s local cluster
 - PostgreSQL
 - Maven
 - Keycloak (Authorization & Authentication)
@@ -67,7 +74,7 @@ This project is composed of multiple microservices using the Netflix stack (~~Eu
 
 ### API Gateway
 
-- All requests pass through the API Gateway on port `8080`.
+- All requests pass through the API Gateway on apigw.prod.local (k8s) / localhost:8080 (local)`.
 - **Example:**  
   - **GET** `/api/v1/customers/public`  
     Routes the request to the Customer service.
@@ -113,7 +120,6 @@ This project is composed of multiple microservices using the Netflix stack (~~Eu
 ### Clients Module
 
 - Provides Feign clients for inter-service communication such as contacting the Fraud, Notification, and Exchange services.
-- The Feign clients are defined to resolve service names (e.g. `http://fraud`, `http://notification`, `http://exchange`) and load balance using Spring Cloud LoadBalancer.
 
 ### FRONT UI Microservice
 
@@ -209,6 +215,10 @@ This project is composed of multiple microservices using the Netflix stack (~~Eu
 
 ## Architecture Overview
 
+### k8s local cluster (Docker Desktop)
+- **Customer**: `customer.prod.local` - User management and accounts
+
+### local development
 The system consists of the following microservices running on different ports:
 
 - **Customer**: `8081` - User management and accounts
