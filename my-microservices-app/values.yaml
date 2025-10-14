@@ -170,34 +170,6 @@ keycloak:
     adminUser: admin
     adminPassword: admin
 
-# Configuration for the order-service subchart
-# NOTE: Build image locally: `docker build -t order-service:latest in order-service dir
-order-service:
-  replicaCount: 1
-  image:
-    # --- REVERTED TO LOCAL REPO ---
-    repository: order-service # Removed registry prefix
-    tag: "latest"
-    pullPolicy: IfNotPresent # Use IfNotPresent for local images
-    # -----------------------------
-  service:
-    type: ClusterIP
-    port: 8084 # Different port for order service
-  ingress:
-    enabled: true
-    className: "nginx"
-    hosts:
-      - host: order.myapp.local
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-  config:
-    # --- CORRECTED DB URL --- Using '<ReleaseName>-<Alias>' service name convention
-    database_url: "jdbc:postgresql://{{ .Release.Name }}-order-db:5432/orderdb"
-    database_username: "order_user"
-    # database_password_secret: "{{ .Release.Name }}-order-db-postgresql"
-    # database_password_secret_key: "postgresql-password"
-
 apigw-service:
   replicaCount: 1
   image:

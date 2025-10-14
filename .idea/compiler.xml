@@ -13,13 +13,13 @@
         <module name="exchange-service" />
         <module name="customer-service" />
         <module name="front-ui-service" />
-        <module name="order-service" />
         <module name="apigw-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="apigw" target="21" />
+      <module name="order-service" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

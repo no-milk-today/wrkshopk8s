@@ -24,7 +24,6 @@ for ns in test prod; do
   helm uninstall exchange-service -n "$ns" || true
   helm uninstall customer-service -n "$ns" || true
   helm uninstall apigw-service -n "$ns" || true
-  helm uninstall order-service -n "$ns" || true
   helm uninstall postgres -n "$ns" || true
 done
 
@@ -34,7 +33,6 @@ for ns in test prod; do
   kubectl delete secret fraud-service-fraud-db -n "$ns" --ignore-not-found
   kubectl delete secret notification-service-notification-db -n "$ns" --ignore-not-found
   kubectl delete secret exchange-service-exchange-db -n "$ns" --ignore-not-found
-  kubectl delete secret order-service-order-db -n "$ns" --ignore-not-found
 done
 
 echo "Deleting namespaces..."
@@ -54,7 +52,6 @@ docker image rm exchange-service:latest || true
 docker image rm exchange-generator-service:latest || true
 docker image rm front-ui-service:latest || true
 docker image rm apigw-service:latest || true
-docker image rm order-service:latest || true
 docker image rm jenkins-jenkins:latest || true
 
 echo "Pruning system..."

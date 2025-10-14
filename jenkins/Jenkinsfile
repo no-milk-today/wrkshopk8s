@@ -23,7 +23,6 @@ pipeline {
                 docker build -t customer-service:${IMAGE_TAG} -f customer-service/Dockerfile .
                 docker build -t fraud-service:${IMAGE_TAG} -f fraud-service/Dockerfile .
                 docker build -t notification-service:${IMAGE_TAG} -f notification-service/Dockerfile .
-                docker build -t order-service:${IMAGE_TAG} -f order-service/Dockerfile .
                 docker build -t exchange-service:${IMAGE_TAG} -f exchange-service/Dockerfile .
                 docker build -t exchange-generator-service:${IMAGE_TAG} -f exchange-generator-service/Dockerfile .
                 docker build -t front-ui-service:${IMAGE_TAG} -f front-ui-service/Dockerfile .
@@ -76,10 +75,6 @@ pipeline {
 //                   --from-literal=password=${DB_PASSWORD} \\
 //                   -n test --dry-run=client -o yaml | kubectl apply -f -
 //
-//                 kubectl create secret generic order-service-order-db \\
-//                   --from-literal=password=${DB_PASSWORD} \\
-//                   -n test --dry-run=client -o yaml | kubectl apply -f -
-//
 //                 kubectl create secret generic fraud-service-fraud-db \\
 //                   --from-literal=password=${DB_PASSWORD} \\
 //                   -n test --dry-run=client -o yaml | kubectl apply -f -
@@ -104,15 +99,6 @@ pipeline {
 //                   --set image.tag=${IMAGE_TAG} \\
 //                   --set ingress.enabled=true \\
 //                   --set ingress.hosts[0].host=customer.test.local \\
-//                   --set ingress.hosts[0].paths[0].path="/" \\
-//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
-//
-//                 helm upgrade --install order-service my-microservices-app/charts/order-service \\
-//                   --namespace test --create-namespace \\
-//                   --set image.repository=order-service \\
-//                   --set image.tag=${IMAGE_TAG} \\
-//                   --set ingress.enabled=true \\
-//                   --set ingress.hosts[0].host=order.test.local \\
 //                   --set ingress.hosts[0].paths[0].path="/" \\
 //                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
 //
@@ -201,10 +187,6 @@ pipeline {
             steps {
                 sh """
                 kubectl create secret generic customer-service-customer-db \\
-                  --from-literal=password=${DB_PASSWORD} \\
-                  -n prod --dry-run=client -o yaml | kubectl apply -f -
-
-                kubectl create secret generic order-service-order-db \\
                   --from-literal=password=${DB_PASSWORD} \\
                   -n prod --dry-run=client -o yaml | kubectl apply -f -
 
