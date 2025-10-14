@@ -31,6 +31,11 @@ dependencies:
     version: "0.1.0"
     repository: "file://./charts/exchange-generator-service"  # Local path reference
 
+  # Subchart for Cash Service
+  - name: cash-service
+    version: "0.1.0"
+    repository: "file://./charts/cash-service"  # Local path reference
+
   # Subchart for Transfer Service
   - name: transfer-service
     version: "0.1.0"

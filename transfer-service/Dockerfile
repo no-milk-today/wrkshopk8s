@@ -10,6 +10,7 @@ COPY customer-service/pom.xml customer-service/pom.xml
 COPY exchange-service/pom.xml exchange-service/pom.xml
 COPY front-ui-service/pom.xml front-ui-service/pom.xml
 COPY apigw-service/pom.xml apigw-service/pom.xml
+COPY cash-service/pom.xml cash-service/pom.xml
 COPY clients/pom.xml clients/pom.xml
 
 RUN mvn -B -pl transfer-service -am dependency:go-offline

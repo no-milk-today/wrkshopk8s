@@ -25,6 +25,7 @@ pipeline {
                 docker build -t notification-service:${IMAGE_TAG} -f notification-service/Dockerfile .
                 docker build -t exchange-service:${IMAGE_TAG} -f exchange-service/Dockerfile .
                 docker build -t exchange-generator-service:${IMAGE_TAG} -f exchange-generator-service/Dockerfile .
+                docker build -t cash-service:${IMAGE_TAG} -f cash-service/Dockerfile .
                 docker build -t transfer-service:${IMAGE_TAG} -f transfer-service/Dockerfile .
                 docker build -t front-ui-service:${IMAGE_TAG} -f front-ui-service/Dockerfile .
                 docker build -t apigw-service:${IMAGE_TAG} -f apigw-service/Dockerfile .
@@ -136,6 +137,15 @@ pipeline {
 //                   --set image.tag=${IMAGE_TAG} \\
 //                   --set ingress.enabled=true \\
 //                   --set ingress.hosts[0].host=exchange-generator.test.local \\
+//                   --set ingress.hosts[0].paths[0].path="/" \\
+//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+//
+//                 helm upgrade --install cash-service my-microservices-app/charts/cash-service \\
+//                   --namespace test --create-namespace \\
+//                   --set image.repository=cash-service \\
+//                   --set image.tag=${IMAGE_TAG} \\
+//                   --set ingress.enabled=true \\
+//                   --set ingress.hosts[0].host=cash.test.local \\
 //                   --set ingress.hosts[0].paths[0].path="/" \\
 //                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
 //
@@ -286,6 +296,15 @@ pipeline {
                   --set image.tag=${IMAGE_TAG} \\
                   --set ingress.enabled=true \\
                   --set ingress.hosts[0].host=exchange-generator.prod.local \\
+                  --set ingress.hosts[0].paths[0].path="/" \\
+                  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+
+                helm upgrade --install cash-service my-microservices-app/charts/cash-service \\
+                  --namespace prod --create-namespace \\
+                  --set image.repository=cash-service \\
+                  --set image.tag=${IMAGE_TAG} \\
+                  --set ingress.enabled=true \\
+                  --set ingress.hosts[0].host=cash.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
 

@@ -22,6 +22,7 @@ for ns in test prod; do
   helm uninstall notification-service -n "$ns" || true
   helm uninstall exchange-generator-service -n "$ns" || true
   helm uninstall exchange-service -n "$ns" || true
+  helm uninstall cash-service -n "$ns" || true
   helm uninstall tansfer-service -n "$ns" || true
   helm uninstall customer-service -n "$ns" || true
   helm uninstall apigw-service -n "$ns" || true
@@ -51,6 +52,7 @@ docker image rm fraud-service:latest || true
 docker image rm notification-service:latest || true
 docker image rm exchange-service:latest || true
 docker image rm exchange-generator-service:latest || true
+docker image rm cash-service:latest || true
 docker image rm transfer-service:latest || true
 docker image rm front-ui-service:latest || true
 docker image rm apigw-service:latest || true

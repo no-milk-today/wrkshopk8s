@@ -124,6 +124,26 @@ exchange-generator-service:
           - path: /
             pathType: ImplementationSpecific
 
+cash-service:
+  replicaCount: 1
+  image:
+    repository: cash-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8088
+  ingress:
+    enabled: true
+    className: "nginx"
+    hosts:
+      - host: cash.myapp.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+  config:
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+
 transfer-service:
   replicaCount: 1
   image:

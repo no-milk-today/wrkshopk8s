@@ -9,6 +9,7 @@ COPY fraud-service/pom.xml fraud-service/pom.xml
 COPY notification-service/pom.xml notification-service/pom.xml
 COPY front-ui-service/pom.xml front-ui-service/pom.xml
 COPY apigw-service/pom.xml apigw-service/pom.xml
+COPY cash-service/pom.xml cash-service/pom.xml
 COPY transfer-service/pom.xml transfer-service/pom.xml
 COPY clients/pom.xml clients/pom.xml
 
