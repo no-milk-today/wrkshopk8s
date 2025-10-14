@@ -141,6 +141,8 @@ transfer-service:
         paths:
           - path: /
             pathType: ImplementationSpecific
+  config:
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
 
 front-ui-service:
   replicaCount: 1
