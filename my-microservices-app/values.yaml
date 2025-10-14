@@ -1,6 +1,6 @@
 # Global values (if any)
 global:
-  domain: myapp.local # Example domain for ingress
+  domain: prod.local # Example domain for ingress
 
 # Configuration for the customer-service subchart
 # NOTE: For local development (Minikube/Kind/Docker Desktop), build the image locally
@@ -21,7 +21,7 @@ customer-service:
     enabled: true
     className: "nginx" # Specify your ingress controller class
     hosts:
-      - host: customer.myapp.local # Use global domain or specific
+      - host: customer.prod.local # Use global domain or specific
         paths:
           - path: /
             pathType: ImplementationSpecific
@@ -33,7 +33,7 @@ customer-service:
     database_username: "customer_user"
     # database_password_secret: "{{ .Release.Name }}-customer-db-postgresql" # Reference to secret created by DB chart
     # database_password_secret_key: "postgresql-password" # Key within the secret
-    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
     DDL_AUTO_MODE: "update"
 
 fraud-service:
@@ -49,7 +49,7 @@ fraud-service:
     enabled: true
     className: "nginx"
     hosts:
-      - host: fraud.myapp.local
+      - host: fraud.prod.local
         paths:
           - path: /
             pathType: ImplementationSpecific
@@ -72,7 +72,7 @@ notification-service:
     enabled: true
     className: "nginx"
     hosts:
-      - host: notification.myapp.local
+      - host: notification.prod.local
         paths:
           - path: /
             pathType: ImplementationSpecific
@@ -95,7 +95,7 @@ exchange-service:
     enabled: true
     className: "nginx"
     hosts:
-      - host: exchange.myapp.local
+      - host: exchange.prod.local
         paths:
           - path: /
             pathType: ImplementationSpecific
@@ -119,7 +119,7 @@ exchange-generator-service:
     enabled: true
     className: "nginx"
     hosts:
-      - host: exchange-generator.myapp.local
+      - host: exchange-generator.prod.local
         paths:
           - path: /
             pathType: ImplementationSpecific
@@ -137,13 +137,13 @@ front-ui-service:
     enabled: true
     className: "nginx"
     hosts:
-      - host: front-ui.myapp.local
+      - host: front-ui.prod.local
         paths:
           - path: /
             pathType: ImplementationSpecific
   config:
-    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
-    KEYCLOAK_SERVER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080"
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
+    KEYCLOAK_SERVER_URL: "http://keycloak.{{ .Release.Namespace }}.local"
 
 keycloak:
   replicaCount: 1
@@ -162,7 +162,7 @@ keycloak:
       nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
       nginx.ingress.kubernetes.io/proxy-headers: "X-Forwarded-Proto, X-Forwarded-For"
     hosts:
-      - host: keycloak.myapp.local
+      - host: keycloak.prod.local
         paths:
           - path: /
             pathType: ImplementationSpecific
@@ -187,7 +187,7 @@ order-service:
     enabled: true
     className: "nginx"
     hosts:
-      - host: order.myapp.local
+      - host: order.prod.local
         paths:
           - path: /
             pathType: ImplementationSpecific
@@ -211,12 +211,12 @@ apigw-service:
     enabled: true
     className: "nginx"
     hosts:
-      - host: apigw.myapp.local
+      - host: apigw.prod.local
         paths:
           - path: /
             pathType: ImplementationSpecific
   config:
-    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
     CUSTOMER_SERVICE_URL: "http://customer-service.{{ .Release.Namespace }}.svc.cluster.local:8081"
     FRONT_UI_SERVICE_URL: "http://front-ui-service.{{ .Release.Namespace }}.svc.cluster.local:8085"
     EXCHANGE_SERVICE_URL: "http://exchange-service.{{ .Release.Namespace }}.svc.cluster.local:8086"

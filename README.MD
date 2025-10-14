@@ -4,16 +4,27 @@ This project is composed of multiple microservices using the Netflix stack (~~Eu
 
 ## add these lines into etc/hosts
 127.0.0.1 customer.test.local
+
 127.0.0.1 customer.prod.local
+
 127.0.0.1 fraud.prod.local
+
 127.0.0.1 notification.prod.local
+
 127.0.0.1 front-ui.prod.local
+
 127.0.0.1 keycloak.prod.local
+
 127.0.0.1 apigw.prod.local
+
 127.0.0.1 exchange.prod.local
+
 127.0.0.1 exchange-generator.prod.local
+
 127.0.0.1 exchange-generator.test.local
+
 127.0.0.1 cash.prod.local
+
 127.0.0.1 transfer.prod.local
 
 
