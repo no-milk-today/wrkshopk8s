@@ -15,6 +15,7 @@
         <module name="front-ui-service" />
         <module name="apigw-service" />
         <module name="notification-service" />
+        <module name="transfer-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
