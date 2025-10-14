@@ -276,8 +276,7 @@ The system consists of the following microservices running on different ports (d
 
 ## Usage Examples
 
-### Register a new customer (for local development)
-Replace all the 'localhost:xxxx' with 'SERVICE_NAME.prod.local' for k8s deployment.
+### Register a new customer (for k8s)
 ```bash
 POST http://apigw.prod.local/signup
 Content-Type: application/json
