@@ -9,6 +9,7 @@ COPY notification-service/pom.xml notification-service/pom.xml
 COPY fraud-service/pom.xml fraud-service/pom.xml
 COPY customer-service/pom.xml customer-service/pom.xml
 COPY exchange-service/pom.xml exchange-service/pom.xml
+COPY transfer-service/pom.xml transfer-service/pom.xml
 COPY clients/pom.xml clients/pom.xml
 
 RUN mvn -B -pl apigw-service -am dependency:go-offline
