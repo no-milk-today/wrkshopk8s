@@ -62,10 +62,10 @@ You can switch profiles by setting the SPRING_PROFILES_ACTIVE environment variab
 - **FRONT UI**  
   Provides a web user interface using Thymeleaf. The service runs on port `8085` and integrates with other microservices via Feign clients. It exposes endpoints such as `/` for the landing page (redirecting to `/main`) and `/main?login={login}` to render the main page with dynamic user data. The UI automatically updates exchange rates every second using JavaScript.
  
-- **Cash**  (not added yet)
+- **Cash**
   Handles cash-in (deposit) and cash-out (withdraw) operations on user accounts.
 
-- **Transfer** (not added yet)
+- **Transfer**
   Handles money transfers between customers accounts.
 
 
