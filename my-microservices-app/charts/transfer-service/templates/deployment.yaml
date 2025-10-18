@@ -20,6 +20,10 @@ spec:
       labels:
         {{- include "transfer-service.selectorLabels" . | nindent 8 }}
     spec:
+      hostAliases:
+        - ip: "10.1.0.88" # kubectl get pod -n ingress-nginx -o wide
+          hostnames:
+            - "keycloak.prod.local"
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

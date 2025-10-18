@@ -142,7 +142,7 @@ cash-service:
           - path: /
             pathType: ImplementationSpecific
   config:
-    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+    KEYCLOAK_ISSUER_URL: "http://keycloak.prod.local/realms/bank-realm"
 
 transfer-service:
   replicaCount: 1
@@ -162,7 +162,7 @@ transfer-service:
           - path: /
             pathType: ImplementationSpecific
   config:
-    KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.svc.cluster.local:8080/realms/bank-realm"
+    KEYCLOAK_ISSUER_URL: "http://keycloak.prod.local/realms/bank-realm"
 
 front-ui-service:
   replicaCount: 1
