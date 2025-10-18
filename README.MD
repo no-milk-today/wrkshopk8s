@@ -13,25 +13,15 @@ All stages are executed through Jenkins Pipeline.
 ## Prerequisites
 To run the project, you will need add such entries to your `/etc/hosts` file
 ```/etc/hosts
-127.0.0.1 customer.test.local
 127.0.0.1 customer.prod.local
-127.0.0.1 fraud.test.local
 127.0.0.1 fraud.prod.local
-127.0.0.1 notification.test.local
 127.0.0.1 notification.prod.local
-127.0.0.1 front-ui.test.local
 127.0.0.1 front-ui.prod.local
-127.0.0.1 keycloak.test.local
 127.0.0.1 keycloak.prod.local
-127.0.0.1 apigw.test.local
 127.0.0.1 apigw.prod.local
-127.0.0.1 exchange.test.local
 127.0.0.1 exchange.prod.local
 127.0.0.1 exchange-generator.prod.local
-127.0.0.1 exchange-generator.test.local
-127.0.0.1 cash.test.local
 127.0.0.1 cash.prod.local
-127.0.0.1 transfer.test.local
 127.0.0.1 transfer.prod.local
 ```
 
@@ -87,7 +77,7 @@ You can switch profiles by setting the SPRING_PROFILES_ACTIVE environment variab
 - Docker Desktop (with k8s), Docker Compose
 - Jenkins
 - Helm
-- PostgreSQL
+- PostgreSQL (database per service)
 - Maven
 - Keycloak (Authorization & Authentication)
 
