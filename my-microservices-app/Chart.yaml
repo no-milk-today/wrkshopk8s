@@ -83,10 +83,3 @@ dependencies:
     repository: "oci://registry-1.docker.io/bitnamicharts"
     alias: exchange-db
     condition: exchange-db.enabled
-
- # Dependency for Order DB (e.g., PostgreSQL)
-  - name: postgresql
-    version: "15.5.32" # Using a specific known stable version from Bitnami history
-    repository: "oci://registry-1.docker.io/bitnamicharts"
-    alias: order-db # Alias for the order DB instance
-    condition: order-db.enabled

@@ -48,7 +48,7 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
     nginx.ingress.kubernetes.io/proxy-headers: "X-Forwarded-Proto, X-Forwarded-For"
   hosts:
-    - host: keycloak.test.local
+    - host: keycloak.prod.local
       paths:
         - path: /
           pathType: Prefix

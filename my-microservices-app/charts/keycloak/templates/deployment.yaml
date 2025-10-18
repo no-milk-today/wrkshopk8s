@@ -44,6 +44,12 @@ spec:
             - configMapRef:
                 name: {{ include "keycloak.fullname" . }}-realm-config  # Use the correct name
           env:
+            - name: KC_HOSTNAME
+              value: {{ printf "http://%s" (index .Values.ingress.hosts 0).host }}
+            - name: KC_HOSTNAME_STRICT_BACKCHANNEL
+              value: "false"
+            - name: KC_HOSTNAME_BACKCHANNEL_DYNAMIC
+              value: "true"
             - name: KC_BOOTSTRAP_ADMIN_USERNAME
               value: {{ .Values.env.adminUser }}
             - name: KC_BOOTSTRAP_ADMIN_PASSWORD
