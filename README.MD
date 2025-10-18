@@ -35,6 +35,17 @@ To run the project, you will need add such entries to your `/etc/hosts` file
 127.0.0.1 transfer.prod.local
 ```
 
+## Spring Profiles
+The project supports two Spring profiles:
+
+- **default**
+  used for local development, where Keycloak and each DB can be run as Docker containers (Docker Compose) and all the core microservices directly via Maven.
+- **kube**
+  Used for Docker Desktop Kubernetes cluster. This profile contains Kubernetes-specific configuration parameters for service endpoints, Keycloak issuer URLs, database connections, etc.
+  Pods in Kubernetes do not automatically resolve *.prod.local domains to the ingress controller unless you explicitly configure /etc/hosts mapping inside pods using hostAliases. You must set hostAliases in deployment.yaml >> Replace 10.1.0.88 with the current IP of your ingress controller (check via kubectl get pod -n ingress-nginx -o wide).
+
+You can switch profiles by setting the SPRING_PROFILES_ACTIVE environment variable.
+
 ## Modules
 
 - **Customer**  
