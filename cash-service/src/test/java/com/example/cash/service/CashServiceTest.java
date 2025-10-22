@@ -6,7 +6,6 @@ import com.example.clients.customer.AccountDto;
 import com.example.clients.customer.Currency;
 import com.example.clients.customer.CustomerClient;
 import com.example.clients.customer.CustomerDto;
-import com.example.clients.notification.NotificationClient;
 import com.example.clients.notification.NotificationRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,6 +23,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +32,7 @@ class CashServiceTest {
     @Mock
     private CustomerClient customerClient;
     @Mock
-    private NotificationClient notificationClient;
+    private KafkaTemplate<String, NotificationRequest> kafkaTemplate;
     @InjectMocks
     private CashService cashService;
 
@@ -74,7 +75,7 @@ class CashServiceTest {
             assertTrue(response.isSuccess());
             verify(customerClient).updateAccountBalance("user5", "RUB",
                     BigDecimal.valueOf(300));
-            verify(notificationClient).sendNotification(any(NotificationRequest.class));
+            verify(kafkaTemplate).send(eq("notification-topic"), any(NotificationRequest.class));
         }
     }
 
@@ -96,7 +97,7 @@ class CashServiceTest {
 
             assertFalse(rs.isSuccess());
             verify(customerClient, never()).updateAccountBalance(any(), any(), any());
-            verify(notificationClient, never()).sendNotification(any());
+            verify(kafkaTemplate, never()).send(eq("notification-topic"), any(NotificationRequest.class));
         }
     }
 }

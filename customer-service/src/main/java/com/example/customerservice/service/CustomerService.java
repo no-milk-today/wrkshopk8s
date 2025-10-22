@@ -3,7 +3,6 @@ package com.example.customerservice.service;
 import com.example.clients.customer.*;
 import com.example.clients.customer.Currency;
 import com.example.clients.fraud.FraudClient;
-import com.example.clients.notification.NotificationClient;
 import com.example.clients.notification.NotificationRequest;
 import com.example.customerservice.exception.AccountNotFoundException;
 import com.example.customerservice.exception.CustomerNotFoundException;
@@ -15,6 +14,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
     private final FraudClient fraudClient;
-    private final NotificationClient notificationClient;
+    private final KafkaTemplate<String, NotificationRequest> kafkaTemplate;
 
 
     @CircuitBreaker(name = "fraudCheckService", fallbackMethod = "fraudCheckFallback")
@@ -80,15 +80,16 @@ public class CustomerService {
             fraudErrors.add("Your registration is blocked due to fraud suspicion");
             return new CustomerRegistrationResponse(false, fraudErrors);
         }
-        // todo: make it async. i.e. add to queue
-        notificationClient.sendNotification(
-                new NotificationRequest(
-                        customer.getId(),
-                        customer.getEmail(),
-                        String.format("Hi %s, welcome to Bank-system...",
-                                customer.getName())
-                )
+
+        NotificationRequest notificationRequest = new NotificationRequest(
+                customer.getId(),
+                customer.getEmail(),
+                String.format("Hi %s, welcome to Bank-system...",
+                        customer.getName())
         );
+
+        kafkaTemplate.send("notification-topic", notificationRequest);
+        log.info("Sent notification request to Kafka for customer: {}", customer.getId());
         return new CustomerRegistrationResponse(true, Collections.emptyList());
     }
 

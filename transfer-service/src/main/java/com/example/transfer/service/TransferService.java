@@ -6,12 +6,12 @@ import com.example.clients.customer.CustomerDto;
 import com.example.clients.exchange.ExchangeClient;
 import com.example.clients.exchange.ExchangeRateDto;
 import com.example.clients.fraud.FraudClient;
-import com.example.clients.notification.NotificationClient;
 import com.example.clients.notification.NotificationRequest;
 import com.example.clients.transfer.TransferRequest;
 import com.example.clients.transfer.TransferResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,7 +27,7 @@ public class TransferService {
 
     private final CustomerClient customerClient;
     private final FraudClient fraudClient;
-    private final NotificationClient notificationClient;
+    private final KafkaTemplate<String, NotificationRequest> kafkaTemplate;
     private final ExchangeClient exchangeClient;
 
     public TransferResponse transfer(String login, TransferRequest req) {
@@ -77,6 +77,10 @@ public class TransferService {
             return TransferResponse.errors(ownErrors);
         }
 
+        if (!ownErrors.isEmpty() || !otherErrors.isEmpty()) {
+            return buildError(ownErrors, otherErrors);
+        }
+
         /* Обновляем балансы */
         // todo: make it transactional
         customerClient.updateAccountBalance(
@@ -88,19 +92,14 @@ public class TransferService {
                 toAcc.get().balance().add(creditAmount));
 
         /* Notification */
-        var msg = String.format(
-                "Перевод %.2f %s -> %.2f %s от %s к %s",
-                debitAmount, req.fromCurrency(),
-                creditAmount, req.toCurrency(),
-                sender.login(), receiver.login());
-
-        notificationClient.sendNotification(
-                new NotificationRequest(sender.id(), sender.name(), msg)
-        );
+                    var msg = String.format(
+                            "Перевод %.2f %s -> %.2f %s от %s к %s",
+                            debitAmount, req.fromCurrency(),
+                            creditAmount, req.toCurrency(),
+                            sender.login(), login.equals(req.toLogin()) ? sender.login() : receiver.login());
+        kafkaTemplate.send("notification-topic", new NotificationRequest(sender.id(), sender.name(), msg));
         if (!sender.login().equals(receiver.login())) {
-            notificationClient.sendNotification(
-                    new NotificationRequest(receiver.id(), receiver.name(), msg)
-            );
+            kafkaTemplate.send("notification-topic", new NotificationRequest(receiver.id(), receiver.name(), msg));
         }
 
         return TransferResponse.success();

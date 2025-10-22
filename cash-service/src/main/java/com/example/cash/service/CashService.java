@@ -6,10 +6,10 @@ import com.example.clients.cash.CashOperationResponse;
 import com.example.clients.customer.AccountDto;
 import com.example.clients.customer.CustomerClient;
 import com.example.clients.customer.CustomerDto;
-import com.example.clients.notification.NotificationClient;
 import com.example.clients.notification.NotificationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,7 +22,7 @@ import java.util.List;
 public class CashService {
 
     private final CustomerClient customerClient;
-    private final NotificationClient notificationClient;
+    private final KafkaTemplate<String, NotificationRequest> kafkaTemplate;
 
     /**
      * Обработка операции с деньгами (пополнение или снятие)
@@ -155,7 +155,7 @@ public class CashService {
                     message
             );
 
-            notificationClient.sendNotification(notificationRequest);
+            kafkaTemplate.send("notification-topic", notificationRequest);
             log.info("Notification sent to user {} about cash operation", customer.login());
         } catch (Exception e) {
             log.warn("Failed to send notification to user {}: {}", customer.login(), e.getMessage());

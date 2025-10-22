@@ -8,7 +8,6 @@ import com.example.clients.exchange.ExchangeClient;
 import com.example.clients.exchange.ExchangeRateDto;
 import com.example.clients.fraud.FraudCheckResponse;
 import com.example.clients.fraud.FraudClient;
-import com.example.clients.notification.NotificationClient;
 import com.example.clients.notification.NotificationRequest;
 import com.example.clients.transfer.TransferRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,7 +38,7 @@ class TransferServiceTest {
     @Mock
     private FraudClient fraudClient;
     @Mock
-    private NotificationClient notificationClient;
+    private KafkaTemplate<String, NotificationRequest> kafkaTemplate;
     @Mock
     private ExchangeClient exchangeClient;
     @InjectMocks
@@ -86,7 +86,7 @@ class TransferServiceTest {
         verify(customerClient).updateAccountBalance("bob",   "RUB", BigDecimal.valueOf(350));
         // notifications
         ArgumentCaptor<NotificationRequest> captor = ArgumentCaptor.forClass(NotificationRequest.class);
-        verify(notificationClient, times(2)).sendNotification(captor.capture());
+        verify(kafkaTemplate, times(2)).send(eq("notification-topic"), captor.capture());
         List<NotificationRequest> sent = captor.getAllValues();
         assertThat(sent)
                 .extracting(NotificationRequest::toCustomerId, NotificationRequest::toCustomerName)
@@ -112,7 +112,7 @@ class TransferServiceTest {
         assertFalse(resp.isSuccess());
         assertThat(resp.getTransferErrors()).containsExactly("Fraud detected");
         verify(customerClient, never()).updateAccountBalance(anyString(), anyString(), any());
-        verify(notificationClient, never()).sendNotification(any());
+        verify(kafkaTemplate, never()).send(eq("notification-topic"), any(NotificationRequest.class));
     }
 
     @Test

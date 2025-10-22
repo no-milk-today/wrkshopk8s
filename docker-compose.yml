@@ -99,11 +99,75 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  kafka:
+    image: apache/kafka:4.0.0
+    container_name: bank-kafka
+    ports:
+      - '9092:9092'
+    networks:
+      - kafka-network
+    environment:
+      # === Уникальные идентификаторы ноды ===
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      # === Listeners: три типа соединений ===
+      # PLAINTEXT - для Kafka UI внутри Docker-сети
+      # CONTROLLER - для KRaft контроллера
+      # EXTERNAL - для Java-приложений с хост-машины
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:19092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092
+
+      # === Advertised Listeners: адреса для клиентов ===
+      # kafka:19092 - для Kafka UI (через имя контейнера)
+      # localhost:9092 - для Java Producer/Consumer (через хост)
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:19092,EXTERNAL://localhost:9092
+
+      # === Протоколы безопасности для каждого listener'а ===
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+
+      # === Имя listener'а для контроллера ===
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      # === Кворум контроллеров (у нас 1 нода с ID=1) ===
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      # === Replication Factor = 1 (одна нода, нет репликации) ===
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      # === Директория для хранения данных Kafka ===
+      KAFKA_LOG_DIRS: /tmp/kraft-logs
+
+      # === Cluster ID для KRaft режима (должен быть одинаковый) ===
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+
+    restart: unless-stopped
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: bank-kafka-ui
+    ports:
+      - '7080:8080'
+    networks:
+      - kafka-network
+    environment:
+      # Имя кластера в UI
+      KAFKA_CLUSTERS_0_NAME: local
+      # Подключение к Kafka через PLAINTEXT listener (kafka:19092)
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:19092
+      # Разрешить динамическую конфигурацию кластеров через UI
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    depends_on:
+      - kafka
+    restart: unless-stopped
 
 networks:
   postgres:
     driver: bridge
   spring:
+    driver: bridge
+  kafka-network:
     driver: bridge
 
 volumes:

@@ -5,7 +5,6 @@ import com.example.clients.customer.CustomerRegistrationRequest;
 import com.example.clients.customer.EditPasswordRequest;
 import com.example.clients.fraud.FraudCheckResponse;
 import com.example.clients.fraud.FraudClient;
-import com.example.clients.notification.NotificationClient;
 import com.example.clients.notification.NotificationRequest;
 import com.example.customerservice.exception.AccountNotFoundException;
 import com.example.customerservice.exception.CustomerNotFoundException;
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.math.BigDecimal;
@@ -29,8 +29,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +43,7 @@ class CustomerServiceTest {
     @Mock
     private FraudClient fraudClient;
     @Mock
-    private NotificationClient notificationClient;
+    private KafkaTemplate<String, NotificationRequest> kafkaTemplate;
     @InjectMocks
     private CustomerService customerService;
 
@@ -76,7 +75,7 @@ class CustomerServiceTest {
         var result = customerService.registerCustomer(req);
 
         assertThat(result.success()).isTrue();
-        verify(notificationClient).sendNotification(any(NotificationRequest.class));
+        verify(kafkaTemplate).send(eq("notification-topic"), any(NotificationRequest.class));
     }
 
     @Test

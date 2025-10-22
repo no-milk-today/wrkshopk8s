@@ -13,13 +13,26 @@ management:
       probes:
         enabled: true
 
-# Datasource Configuration (reads from environment variables set by Helm ConfigMap/Secrets)
 spring:
+  kafka:
+    producer:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # Serializer for the message value as JSON
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      # waits for all replicas to acknowledge
+      acks: all
+      # Number of retry attempts for sending messages in case of failure
+      retries: 10
+      properties:
+        # Disable addition of type headers in JSON serialization for simplicity
+        spring.json.add.type.headers: false
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URL:http://localhost:8090/realms/bank-realm}
+  # Datasource Configuration (reads from environment variables set by Helm ConfigMap/Secrets)
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/customer}
     username: ${SPRING_DATASOURCE_USERNAME:customer_user} # Password should be provided via SPRING_DATASOURCE_PASSWORD environment variable (ideally from a Secret)
