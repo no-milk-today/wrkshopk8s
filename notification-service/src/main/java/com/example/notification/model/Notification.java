@@ -1,4 +1,4 @@
-package com.example.notification;
+package com.example.notification.model;
 
 import jakarta.persistence.*;
 import lombok.*;

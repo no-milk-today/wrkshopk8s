@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 @EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
 class CustomerServiceKafkaIntegrationTest extends AbstractIntegrationTest {
 
-    private static final String NOTIFICATION_TOPIC = "notification-topic";
+    private static final String NOTIFICATION_TOPIC = "customer-notification";
 
     @Autowired
     private CustomerService customerService;

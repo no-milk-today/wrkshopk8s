@@ -88,7 +88,7 @@ public class CustomerService {
                         customer.getName())
         );
 
-        kafkaTemplate.send("notification-topic", notificationRequest);
+        kafkaTemplate.send("customer-notification", notificationRequest);
         log.info("Sent notification request to Kafka for customer: {}", customer.getId());
         return new CustomerRegistrationResponse(true, Collections.emptyList());
     }
