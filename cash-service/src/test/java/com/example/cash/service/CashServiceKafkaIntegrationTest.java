@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 })
 class CashServiceKafkaIntegrationTest {
 
-    private static final String NOTIFICATION_TOPIC = "notification-topic";
+    private static final String NOTIFICATION_TOPIC = "cash-notification";
 
     @Autowired
     private CashService cashService;

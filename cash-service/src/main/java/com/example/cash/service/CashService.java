@@ -155,7 +155,7 @@ public class CashService {
                     message
             );
 
-            kafkaTemplate.send("notification-topic", notificationRequest);
+            kafkaTemplate.send("cash-notification", notificationRequest);
             log.info("Notification sent to user {} about cash operation", customer.login());
         } catch (Exception e) {
             log.warn("Failed to send notification to user {}: {}", customer.login(), e.getMessage());

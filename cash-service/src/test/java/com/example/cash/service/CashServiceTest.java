@@ -75,7 +75,7 @@ class CashServiceTest {
             assertTrue(response.isSuccess());
             verify(customerClient).updateAccountBalance("user5", "RUB",
                     BigDecimal.valueOf(300));
-            verify(kafkaTemplate).send(eq("notification-topic"), any(NotificationRequest.class));
+            verify(kafkaTemplate).send(eq("cash-notification"), any(NotificationRequest.class));
         }
     }
 
@@ -97,7 +97,7 @@ class CashServiceTest {
 
             assertFalse(rs.isSuccess());
             verify(customerClient, never()).updateAccountBalance(any(), any(), any());
-            verify(kafkaTemplate, never()).send(eq("notification-topic"), any(NotificationRequest.class));
+            verify(kafkaTemplate, never()).send(eq("cash-notification"), any(NotificationRequest.class));
         }
     }
 }

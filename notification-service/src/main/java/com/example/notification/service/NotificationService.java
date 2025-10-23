@@ -29,7 +29,7 @@ public class NotificationService {
         );
     }
 
-    @KafkaListener(topics = "customer-notification", groupId = "notification-group")
+    @KafkaListener(topics = {"customer-notification", "cash-notification"}, groupId = "notification-group")
     public void listen(NotificationRequest notificationRequest) {
         log.info("Received notification request from Kafka: {}", notificationRequest);
         send(notificationRequest);
