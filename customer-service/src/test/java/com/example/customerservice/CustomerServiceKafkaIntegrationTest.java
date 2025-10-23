@@ -36,13 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(properties = "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}")
 @EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
-@DirtiesContext
-@TestPropertySource(properties = {
-        "spring.profiles.active=default"
-})
-class CustomerServiceKafkaIntegrationTest {
+class CustomerServiceKafkaIntegrationTest extends AbstractIntegrationTest {
 
     private static final String NOTIFICATION_TOPIC = "notification-topic";
 
