@@ -1,6 +1,18 @@
 server:
   port: 8087
 
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      # Дополнительные настройки для надежности
+      properties:
+        spring.json.add.type.headers: false
+      acks: all
+      retries: 3
+
 # Spring Boot Actuator endpoints
 management:
   endpoints:
@@ -11,17 +23,3 @@ management:
     health:
       probes:
         enabled: true
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      exchange-client:
-        slidingWindowSize: 10
-        failureRateThreshold: 50
-        waitDurationInOpenState: 10s
-        minimumNumberOfCalls: 3
-  retry:
-    instances:
-      exchange-client:
-        maxAttempts: 3
-        waitDuration: 500ms

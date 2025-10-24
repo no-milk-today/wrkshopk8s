@@ -1,6 +1,5 @@
 package com.example.exchangegenerator.service;
 
-import com.example.clients.exchange.ExchangeClient;
 import com.example.clients.exchange.ExchangeRateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -9,9 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +24,9 @@ import static org.mockito.Mockito.*;
 class ExchangeGeneratorServiceTest {
 
     @Mock
-    private ExchangeClient exchangeClient;
+    private KafkaTemplate<String, List<ExchangeRateDto>> kafkaTemplate;
+    @Mock
+    private CompletableFuture<SendResult<String, List<ExchangeRateDto>>> completableFuture;
 
     private ObjectMapper objectMapper;
     private ExchangeGeneratorService service;
@@ -30,7 +34,7 @@ class ExchangeGeneratorServiceTest {
     @BeforeEach
     void init() {
         objectMapper = new ObjectMapper();
-        service = new ExchangeGeneratorService(exchangeClient, objectMapper);
+        service = new ExchangeGeneratorService(kafkaTemplate, objectMapper);
     }
 
     @Test
@@ -55,15 +59,16 @@ class ExchangeGeneratorServiceTest {
     void generateAndUpdateRates_sendsRoundRobinRates() {
         // init data
         service.loadExchangeRates();
+        when(kafkaTemplate.send(any(), any(), any())).thenReturn(completableFuture);
 
         service.generateAndUpdateRates(); // index 0
         service.generateAndUpdateRates(); // index 1
 
-        verify(exchangeClient, times(2)).updateRates(any());
+        verify(kafkaTemplate, times(2)).send(any(), any(), any());
     }
 
     @AfterEach
     void verifyNoMore() {
-        verifyNoMoreInteractions(exchangeClient);
+        verifyNoMoreInteractions(kafkaTemplate);
     }
 }

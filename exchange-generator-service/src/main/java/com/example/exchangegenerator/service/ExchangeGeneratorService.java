@@ -1,15 +1,13 @@
 package com.example.exchangegenerator.service;
 
-import com.example.clients.exchange.ExchangeClient;
 import com.example.clients.exchange.ExchangeRateDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +20,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public class ExchangeGeneratorService {
 
-    private final ExchangeClient exchangeClient;
+    private final KafkaTemplate<String, List<ExchangeRateDto>> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
     private List<List<ExchangeRateDto>> exchangeRateSets;
     private final AtomicInteger currentIndex = new AtomicInteger(0);
+
+    private static final String EXCHANGE_TOPIC = "exchange-rates";
 
     @PostConstruct
     public void loadExchangeRates() {
@@ -44,8 +44,6 @@ public class ExchangeGeneratorService {
     }
 
     @Scheduled(fixedRate = 5000) // every 5 seconds
-    @CircuitBreaker(name = "exchange-client", fallbackMethod = "updateRatesFallback")
-    @Retry(name = "exchange-client")
     public void generateAndUpdateRates() {
         if (exchangeRateSets == null || exchangeRateSets.isEmpty()) {
             log.warn("No exchange rate sets available");
@@ -59,24 +57,14 @@ public class ExchangeGeneratorService {
         log.info("Updating exchange rates (set {} of {}): {}",
                 index + 1, exchangeRateSets.size(), rates);
 
-        exchangeClient.updateRates(rates);
-        log.info("Successfully updated exchange rates");
+        kafkaTemplate.send(EXCHANGE_TOPIC, "exchange-rates-update", rates)
+                .whenComplete((result, ex) -> {
+                    if (ex != null) {
+                        log.error("Failed to send exchange rates to Kafka", ex);
+                    } else {
+                        log.info("Successfully sent exchange rates to Kafka topic: {}", EXCHANGE_TOPIC);
+                    }
+                });
     }
 
-    public void updateRatesFallback(Exception ex) {
-        log.error("Exchange service unavailable: {}. Sending default exchange rates.", ex.getMessage());
-
-        List<ExchangeRateDto> defaultRates = List.of(
-                new ExchangeRateDto("Рубль", "RUB", 1.0),
-                new ExchangeRateDto("Доллар", "USD", 95.00),
-                new ExchangeRateDto("Юань", "CNY", 13.50)
-        );
-        try {
-            // Повторная попытка выставить стандартные значения
-            exchangeClient.updateRates(defaultRates);
-            log.info("Default exchange rates have been sent to exchange service in fallback.");
-        } catch (Exception fatal) {
-            log.error("Failed to send default exchange rates in fallback scenario: {}", fatal.getMessage());
-        }
-    }
 }
