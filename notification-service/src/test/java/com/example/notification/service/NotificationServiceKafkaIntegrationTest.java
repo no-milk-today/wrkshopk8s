@@ -1,11 +1,11 @@
 package com.example.notification.service;
 
 import com.example.clients.notification.NotificationRequest;
+import com.example.notification.AbstractIntegrationTest;
 import com.example.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
@@ -16,17 +16,14 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest(properties = {
+@EmbeddedKafka(partitions = 1, topics = { "customer-notification", "cash-notification" }, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+@DirtiesContext
+@TestPropertySource(properties = {
         "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}",
         "spring.kafka.producer.bootstrap-servers=${spring.embedded.kafka.brokers}",
         "spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer"
 })
-@EmbeddedKafka(partitions = 1, topics = { "customer-notification", "cash-notification" }, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
-@DirtiesContext
-@TestPropertySource(properties = {
-        "spring.profiles.active=default"
-})
-class NotificationServiceKafkaIntegrationTest {
+class NotificationServiceKafkaIntegrationTest extends AbstractIntegrationTest {
 
     private static final String CUSTOMER_NOTIFICATION_TOPIC = "customer-notification";
     private static final String CASH_NOTIFICATION_TOPIC = "cash-notification";
