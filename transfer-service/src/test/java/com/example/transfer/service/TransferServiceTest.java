@@ -86,7 +86,7 @@ class TransferServiceTest {
         verify(customerClient).updateAccountBalance("bob",   "RUB", BigDecimal.valueOf(350));
         // notifications
         ArgumentCaptor<NotificationRequest> captor = ArgumentCaptor.forClass(NotificationRequest.class);
-        verify(kafkaTemplate, times(2)).send(eq("notification-topic"), captor.capture());
+        verify(kafkaTemplate, times(2)).send(eq("transfer-notification"), captor.capture());
         List<NotificationRequest> sent = captor.getAllValues();
         assertThat(sent)
                 .extracting(NotificationRequest::toCustomerId, NotificationRequest::toCustomerName)
@@ -112,7 +112,7 @@ class TransferServiceTest {
         assertFalse(resp.isSuccess());
         assertThat(resp.getTransferErrors()).containsExactly("Fraud detected");
         verify(customerClient, never()).updateAccountBalance(anyString(), anyString(), any());
-        verify(kafkaTemplate, never()).send(eq("notification-topic"), any(NotificationRequest.class));
+        verify(kafkaTemplate, never()).send(eq("transfer-notification"), any(NotificationRequest.class));
     }
 
     @Test

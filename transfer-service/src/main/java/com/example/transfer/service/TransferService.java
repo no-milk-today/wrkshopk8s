@@ -97,9 +97,9 @@ public class TransferService {
                             debitAmount, req.fromCurrency(),
                             creditAmount, req.toCurrency(),
                             sender.login(), login.equals(req.toLogin()) ? sender.login() : receiver.login());
-        kafkaTemplate.send("notification-topic", new NotificationRequest(sender.id(), sender.name(), msg));
+        kafkaTemplate.send("transfer-notification", new NotificationRequest(sender.id(), sender.name(), msg));
         if (!sender.login().equals(receiver.login())) {
-            kafkaTemplate.send("notification-topic", new NotificationRequest(receiver.id(), receiver.name(), msg));
+            kafkaTemplate.send("transfer-notification", new NotificationRequest(receiver.id(), receiver.name(), msg));
         }
 
         return TransferResponse.success();
