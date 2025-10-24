@@ -75,7 +75,7 @@ class CustomerServiceTest {
         var result = customerService.registerCustomer(req);
 
         assertThat(result.success()).isTrue();
-        verify(kafkaTemplate).send(eq("notification-topic"), any(NotificationRequest.class));
+        verify(kafkaTemplate).send(eq("customer-notification"), any(NotificationRequest.class));
     }
 
     @Test
