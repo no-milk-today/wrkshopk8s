@@ -1,6 +1,6 @@
 # Bank Microservices Project
 
-This project is composed of multiple microservices using the Netflix stack (~~Eureka~~, Feign, Resilience4j) with Spring Boot and Maven.
+This project is composed of multiple microservices using the Netflix stack (~~Eureka~~, Feign, Resilience4j) with Spring Boot, Kafka and Maven.
 ## Jenkins + Docker + Kubernetes + Helm
 The project automates the CI/CD process for banking microservices. It performs:
 - code build and testing;
