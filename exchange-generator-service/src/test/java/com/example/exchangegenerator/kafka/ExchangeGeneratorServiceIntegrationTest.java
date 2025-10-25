@@ -17,6 +17,7 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.Duration;
@@ -36,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
         "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}"
 })
 @DirtiesContext
+@ActiveProfiles("default")
 public class ExchangeGeneratorServiceIntegrationTest {
 
     @Autowired
