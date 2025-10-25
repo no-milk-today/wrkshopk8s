@@ -20,7 +20,9 @@ spring:
       group-id: exchange-service-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties.spring.json.trusted.packages: com.example.clients.exchange
+      properties:
+        spring.json.value.default.type: com.example.clients.exchange.ExchangeRequest
+        spring.json.trusted.packages: "*"
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5436/exchange}
     username: ${SPRING_DATASOURCE_USERNAME:exchange_user} # Password should be provided via SPRING_DATASOURCE_PASSWORD environment variable (ideally from a Secret)
