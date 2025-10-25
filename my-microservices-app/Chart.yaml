@@ -83,3 +83,10 @@ dependencies:
     repository: "oci://registry-1.docker.io/bitnamicharts"
     alias: exchange-db
     condition: exchange-db.enabled
+
+  # Dependency for Kafka
+  - name: kafka
+    version: "26.1.1"
+    repository: "oci://registry-1.docker.io/bitnamicharts"
+    alias: kafka
+    condition: kafka.enabled

@@ -79,6 +79,7 @@ notification-service:
   config:
     database_url: "jdbc:postgresql://{{ .Release.Name }}-notification-db:5432/notificationdb"
     database_username: "notification_user"
+    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
     # database_password_secret: "{{ .Release.Name }}-notification-db-postgresql"
     # database_password_secret_key: "postgresql-password"
 
@@ -106,6 +107,8 @@ exchange-service:
     # database_password_secret: "{{ .Release.Name }}-exchange-db-postgresql"
     # database_password_secret_key: "postgresql-password"
 
+    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
+
 exchange-generator-service:
   replicaCount: 1
   image:
@@ -123,6 +126,8 @@ exchange-generator-service:
         paths:
           - path: /
             pathType: ImplementationSpecific
+  config:
+    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
 
 cash-service:
   replicaCount: 1
@@ -262,3 +267,14 @@ exchange-db:
     persistence:
       enabled: true
       size: 1Gi
+
+kafka:
+  enabled: true
+  replicaCount: 1
+  auth:
+    interBrokerProtocol: "plaintext"
+  listeners:
+    client:
+      protocol: "PLAINTEXT"
+  kraft:
+    enabled: true

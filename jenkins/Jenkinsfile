@@ -228,14 +228,28 @@ pipeline {
         stage('Deploy Keycloak to PROD') {
             steps {
                 sh """
-                helm upgrade --install keycloak my-microservices-app/charts/keycloak \\
-                  --namespace prod --create-namespace \\
-                  --set configMap.enabled=true \\
-                  --set image.tag="26.1.3" \\
-                  --set ingress.enabled=true \\
-                  --set ingress.hosts[0].host=keycloak.prod.local \\
-                  --set ingress.hosts[0].paths[0].path="/" \\
+                helm upgrade --install keycloak my-microservices-app/charts/keycloak \ 
+                  --namespace prod --create-namespace \ 
+                  --set configMap.enabled=true \ 
+                  --set image.tag="26.1.3" \ 
+                  --set ingress.enabled=true \ 
+                  --set ingress.hosts[0].host=keycloak.prod.local \ 
+                  --set ingress.hosts[0].paths[0].path="/" \ 
                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+                """
+            }
+        }
+
+        stage('Deploy Kafka to PROD') {
+            steps {
+                sh """
+                helm upgrade --install kafka oci://registry-1.docker.io/bitnamicharts/kafka \ 
+                  --namespace prod --create-namespace \ 
+                  --set replicaCount=1 \ 
+                  --set auth.interBrokerProtocol=plaintext \ 
+                  --set listeners.client.protocol=PLAINTEXT \ 
+                  --set kraft.enabled=true \ 
+                  --wait --timeout 5m
                 """
             }
         }
