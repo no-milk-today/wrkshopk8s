@@ -45,16 +45,16 @@ You can switch profiles by setting the SPRING_PROFILES_ACTIVE environment variab
   Provides endpoints to check if a customer is fraudulent. It stores fraud check history and uses a service to determine fraud status.
 
 - **Exchange**  
-  Manages currency exchange rates for the banking system. Provides real-time currency rates relative to RUB (base currency) and handles rate updates. Supports RUB, USD, and CNY currencies. The service stores exchange rates in PostgreSQL and integrates with the Exchange Generator service for automatic rate updates.
+  Manages currency exchange rates for the banking system. Provides real-time currency rates relative to RUB (base currency). It consumes rate updates from a Kafka topic, which are sent by the Exchange Generator service. Supports RUB, USD, and CNY currencies. The service stores exchange rates in PostgreSQL.
 
 - **Exchange Generator**  
-  A separate service that provides exchange rates for RUB, USD, and CNY. Updates the Exchange service with new rates every 5 seconds via Feign Client. It uses JSON file with exchange rates as a data source (using Round Robin strategy for rate selection).
+  A separate service that provides exchange rates for RUB, USD, and CNY. It sends rate updates to a Kafka topic every 5 seconds. It uses a JSON file with exchange rates as a data source (using a Round Robin strategy for rate selection).
 
 - **Clients**  
   Contains shared Feign clients and response object definitions used for inter-service communication.
 
 - **Notification**  
-  Handles sending notifications to customers. It uses a PostgreSQL database for persistence. The service receives notification requests from other microservices via Feign clients and processes them asynchronously.
+  Handles sending notifications to customers. It uses a PostgreSQL database for persistence. The service receives notification requests from other microservices asynchronously via Kafka.
 
 - **API Gateway**  
   Routes incoming requests to the appropriate microservices. It is built using Spring Cloud Gateway and provides load balancing, routing, and fallback capabilities. The gateway uses filters to handle cross-cutting concerns like error handling and circuit breaking.
@@ -77,7 +77,9 @@ You can switch profiles by setting the SPRING_PROFILES_ACTIVE environment variab
 - Docker Desktop (with k8s), Docker Compose
 - Jenkins
 - Helm
+- Kafka
 - PostgreSQL (database per service)
+- Testcontainers
 - Maven
 - Keycloak (Authorization & Authentication)
 
@@ -122,9 +124,6 @@ You can switch profiles by setting the SPRING_PROFILES_ACTIVE environment variab
 
 - **GET** `/api/rates`  
   Retrieves current currency exchange rates. Returns a JSON array with exchange rate information for all supported currencies (RUB, USD, CNY).
-
-- **PUT** `/api/rates/update`  
-  Updates currency exchange rates. Accepts a JSON array of exchange rate objects with `title`, `name`, and `value` fields.
 
 ### Fraud Microservice
 
@@ -252,6 +251,7 @@ The system consists of the following microservices running on different ports (d
 2. ```docker-compose up -d```.
    - **Note:** Ensure that the Keycloak server is running on port `8090` and the realm is named `bank-realm`.
    - The Keycloak server will be used for authentication and authorization.
+   - Insure that Kafka is up and running `localhost:9092`. Kafka UI on `localhost:7080`
 
 3. Build the project:
    ```bash
@@ -262,7 +262,8 @@ The system consists of the following microservices running on different ports (d
    mvn spring-boot:run
     ```
 5. Register new customer `http://localhost:8080/signup`.
-6. Access the application (api-gateway) at `http://localhost:8080`. After successful login redirect to http://localhost:8080/main 
+6. Access the application (api-gateway) at `http://localhost:8080`. After successful login redirect to http://localhost:8080/main
+7. Access Kafka UI on `localhost:7080`
 7. Do logout (via `http://localhost:8080/logout` and create one more customer (to test transferring money between them).
 
 ## Running the Project in Kubernetes
@@ -346,28 +347,8 @@ Accept: application/json
 ```
 
 ### Update exchange rates
-```bash
-PUT http://localhost:8086/api/rates/update
-Content-Type: application/json
 
-[
-  {
-    "title": "Рубль",
-    "name": "RUB",
-    "value": 1.0
-  },
-  {
-    "title": "Доллар",
-    "name": "USD",
-    "value": 94.00
-  },
-  {
-    "title": "Юань",
-    "name": "CNY",
-    "value": 13.50
-  }
-]
-```
+Exchange rates are updated automatically via Kafka. The `exchange-generator-service` produces new rates to a Kafka topic, and the `exchange-service` consumes them. This process happens automatically and does not require manual intervention.
 
 ### DEPOSIT cash operation:
 ```http
