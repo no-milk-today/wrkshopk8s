@@ -35,6 +35,7 @@ customer-service:
     # database_password_secret_key: "postgresql-password" # Key within the secret
     KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
     DDL_AUTO_MODE: "update"
+    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
 
 fraud-service:
   replicaCount: 1
@@ -148,6 +149,7 @@ cash-service:
             pathType: ImplementationSpecific
   config:
     KEYCLOAK_ISSUER_URL: "http://keycloak.prod.local/realms/bank-realm"
+    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
 
 transfer-service:
   replicaCount: 1
@@ -168,6 +170,7 @@ transfer-service:
             pathType: ImplementationSpecific
   config:
     KEYCLOAK_ISSUER_URL: "http://keycloak.prod.local/realms/bank-realm"
+    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
 
 front-ui-service:
   replicaCount: 1
