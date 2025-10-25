@@ -16,6 +16,4 @@ public interface ExchangeClient {
     @GetMapping("/api/rates")
     List<ExchangeRateDto> getRates();
 
-    @PutMapping("/api/rates/update")
-    void updateRates(@RequestBody List<ExchangeRateDto> rates);
 }

@@ -14,6 +14,13 @@ management:
 
 # Datasource Configuration (reads from environment variables set by Helm ConfigMap/Secrets)
 spring:
+  kafka:
+    consumer:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+      group-id: exchange-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties.spring.json.trusted.packages: com.example.clients.exchange
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5436/exchange}
     username: ${SPRING_DATASOURCE_USERNAME:exchange_user} # Password should be provided via SPRING_DATASOURCE_PASSWORD environment variable (ideally from a Secret)

@@ -45,17 +45,4 @@ class ExchangeControllerTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[1].name").value("USD"));
     }
-
-    @Test
-    void updateRates() throws Exception {
-        var payload = List.of(new ExchangeRateDto("Юань","CNY",13.2));
-        var json = objectMapper.writeValueAsString(payload);
-
-        mockMvc.perform(put("/api/rates/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk());
-
-        verify(exchangeService).updateRates(payload);
-    }
 }

@@ -2,6 +2,7 @@ package com.example.exchange.service;
 
 import com.example.clients.customer.Currency;
 import com.example.clients.exchange.ExchangeRateDto;
+import com.example.clients.exchange.ExchangeRequest;
 import com.example.exchange.mapper.ExchangeRateFromDTOConverter;
 import com.example.exchange.mapper.ExchangeRateToDTOConverter;
 import com.example.exchange.model.ExchangeRate;
@@ -40,10 +41,10 @@ public class ExchangeService {
 
     /** POST /api/rates */
     @Transactional
-    public void updateRates(List<ExchangeRateDto> rates) {
+    public void updateRates(ExchangeRequest request) {
         log.info("Received request to update exchange rates. Deleting existing rates...");
         repo.deleteAll();
-        List<ExchangeRate> ents = rates.stream()
+        List<ExchangeRate> ents = request.getRates().stream()
                 .filter(r -> !Currency.RUB.name().equals(r.getName()))
                 .map(fromDto)
                 .toList();

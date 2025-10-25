@@ -2,6 +2,7 @@ package com.example.exchange.service;
 
 import com.example.clients.customer.Currency;
 import com.example.clients.exchange.ExchangeRateDto;
+import com.example.clients.exchange.ExchangeRequest;
 import com.example.exchange.mapper.ExchangeRateFromDTOConverter;
 import com.example.exchange.mapper.ExchangeRateToDTOConverter;
 import com.example.exchange.model.ExchangeRate;
@@ -56,8 +57,9 @@ class ExchangeServiceTest {
         var r1 = new ExchangeRateDto("Рубль", "RUB", 1.0);
         var r2 = new ExchangeRateDto("Доллар", "USD", 94.0);
         var r3 = new ExchangeRateDto("Юань", "CNY", 13.2);
+        var request = new ExchangeRequest(List.of(r1, r2, r3));
 
-        underTest.updateRates(List.of(r1, r2, r3));
+        underTest.updateRates(request);
 
         ArgumentCaptor<List<ExchangeRate>> captor = ArgumentCaptor.forClass(List.class);
         verify(repo).deleteAll();

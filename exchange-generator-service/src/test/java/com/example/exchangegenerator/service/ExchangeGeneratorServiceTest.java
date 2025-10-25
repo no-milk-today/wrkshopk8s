@@ -1,6 +1,7 @@
 package com.example.exchangegenerator.service;
 
 import com.example.clients.exchange.ExchangeRateDto;
+import com.example.clients.exchange.ExchangeRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,9 +25,9 @@ import static org.mockito.Mockito.*;
 class ExchangeGeneratorServiceTest {
 
     @Mock
-    private KafkaTemplate<String, List<ExchangeRateDto>> kafkaTemplate;
+    private KafkaTemplate<String, ExchangeRequest> kafkaTemplate;
     @Mock
-    private CompletableFuture<SendResult<String, List<ExchangeRateDto>>> completableFuture;
+    private CompletableFuture<SendResult<String, ExchangeRequest>> completableFuture;
 
     private ObjectMapper objectMapper;
     private ExchangeGeneratorService service;
@@ -59,12 +60,12 @@ class ExchangeGeneratorServiceTest {
     void generateAndUpdateRates_sendsRoundRobinRates() {
         // init data
         service.loadExchangeRates();
-        when(kafkaTemplate.send(any(), any(), any())).thenReturn(completableFuture);
+        when(kafkaTemplate.send(any(), any(), any(ExchangeRequest.class))).thenReturn(completableFuture);
 
         service.generateAndUpdateRates(); // index 0
         service.generateAndUpdateRates(); // index 1
 
-        verify(kafkaTemplate, times(2)).send(any(), any(), any());
+        verify(kafkaTemplate, times(2)).send(any(), any(), any(ExchangeRequest.class));
     }
 
     @AfterEach

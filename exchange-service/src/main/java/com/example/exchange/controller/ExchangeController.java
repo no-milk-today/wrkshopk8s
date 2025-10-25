@@ -17,11 +17,5 @@ public class ExchangeController {
     public List<ExchangeRateDto> getRates() {
         return exchangeService.getAllRates();
     }
-
-    // it is used by exchange-generator service to update exchange rates via REST API
-    @PutMapping("/update")
-    public void updateRates(@RequestBody List<ExchangeRateDto> rates) {
-        exchangeService.updateRates(rates);
-    }
 }
 

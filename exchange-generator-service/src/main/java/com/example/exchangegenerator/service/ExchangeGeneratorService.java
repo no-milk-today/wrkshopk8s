@@ -1,6 +1,7 @@
 package com.example.exchangegenerator.service;
 
 import com.example.clients.exchange.ExchangeRateDto;
+import com.example.clients.exchange.ExchangeRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -20,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public class ExchangeGeneratorService {
 
-    private final KafkaTemplate<String, List<ExchangeRateDto>> kafkaTemplate;
+    private final KafkaTemplate<String, ExchangeRequest> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
     private List<List<ExchangeRateDto>> exchangeRateSets;
@@ -53,11 +54,12 @@ public class ExchangeGeneratorService {
         // Round Robin: получаем следующий набор курсов
         int index = currentIndex.getAndUpdate(i -> (i + 1) % exchangeRateSets.size());
         List<ExchangeRateDto> rates = exchangeRateSets.get(index);
+        ExchangeRequest exchangeRequest = new ExchangeRequest(rates);
 
         log.info("Updating exchange rates (set {} of {}): {}",
                 index + 1, exchangeRateSets.size(), rates);
 
-        kafkaTemplate.send(EXCHANGE_TOPIC, "exchange-rates-update", rates)
+        kafkaTemplate.send(EXCHANGE_TOPIC, "exchange-rates-update", exchangeRequest)
                 .whenComplete((result, ex) -> {
                     if (ex != null) {
                         log.error("Failed to send exchange rates to Kafka", ex);
