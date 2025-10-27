@@ -11,7 +11,7 @@ spring:
       properties:
         spring.json.add.type.headers: false # Disable type headers for simpler JSON serialization
     topics:
-      cash-notification: cash-notification # Can be overridden with environment variable
+      cash-notification: cash-notification
   security:
     oauth2:
       resourceserver:
