@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -43,6 +44,11 @@ class TransferServiceTest {
     private ExchangeClient exchangeClient;
     @InjectMocks
     private TransferService underTest;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(underTest, "transferNotificationTopic", "transfer-notification");
+    }
 
     private static CustomerDto buildCustomer(int id, String login, BigDecimal balance) {
         var accDTO = new AccountDto(

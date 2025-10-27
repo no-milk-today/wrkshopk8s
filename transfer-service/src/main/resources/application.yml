@@ -11,7 +11,7 @@ spring:
       properties:
         spring.json.add.type.headers: false # Disable type headers for simpler JSON serialization
     topics:
-      transfer-notification: transfer-notification # Can be overridden with environment variable
+      transfer-notification: transfer-notification
 
   security:
     oauth2:
