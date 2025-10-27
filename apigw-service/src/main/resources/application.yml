@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: apigw-service # Имя приложения отправляется вместе со спанами в Zipkin
   cloud:
     gateway:
       default-filters:
@@ -28,6 +30,12 @@ spring:
 
 # Spring Boot Actuator endpoints
 management:
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411/api/v2/spans} # Эндпоинт Zipkin
+  tracing:
+    sampling:
+      probability: 1 # Частота отправляемых трейсов
   endpoints:
     web:
       exposure:

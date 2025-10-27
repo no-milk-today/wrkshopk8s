@@ -2,6 +2,8 @@ server:
   port: 8087
 
 spring:
+  application:
+    name: exchange-generator-service
   kafka:
     producer:
       bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
@@ -13,8 +15,14 @@ spring:
       acks: all
       retries: 3
 
-# Spring Boot Actuator endpoints
+# Spring Boot Actuator endpoints + Zipkin
 management:
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411/api/v2/spans}
+  tracing:
+    sampling:
+      probability: 1
   endpoints:
     web:
       exposure:
