@@ -9,6 +9,7 @@ import com.example.clients.customer.CustomerDto;
 import com.example.clients.notification.NotificationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ public class CashService {
 
     private final CustomerClient customerClient;
     private final KafkaTemplate<String, NotificationRequest> kafkaTemplate;
+
+    @Value("${spring.kafka.topics.cash-notification}")
+    private String cashNotificationTopic;
 
     /**
      * Обработка операции с деньгами (пополнение или снятие)
@@ -155,7 +159,7 @@ public class CashService {
                     message
             );
 
-            kafkaTemplate.send("cash-notification", notificationRequest);
+            kafkaTemplate.send(cashNotificationTopic, notificationRequest);
             log.info("Notification sent to user {} about cash operation", customer.login());
         } catch (Exception e) {
             log.warn("Failed to send notification to user {}: {}", customer.login(), e.getMessage());

@@ -25,7 +25,7 @@ pipeline {
                 docker build -t notification-service:${IMAGE_TAG} -f notification-service/Dockerfile .
                 docker build -t exchange-service:${IMAGE_TAG} -f exchange-service/Dockerfile .
                 docker build -t exchange-generator-service:${IMAGE_TAG} -f exchange-generator-service/Dockerfile .
-                docker build -t cash-service:${IMAGE_TAG} -f cash-service/Dockerfile .
+                docker build --no-cache -t cash-service:${IMAGE_TAG} -f cash-service/Dockerfile .
                 docker build -t transfer-service:${IMAGE_TAG} -f transfer-service/Dockerfile .
                 docker build -t front-ui-service:${IMAGE_TAG} -f front-ui-service/Dockerfile .
                 docker build -t apigw-service:${IMAGE_TAG} -f apigw-service/Dockerfile .

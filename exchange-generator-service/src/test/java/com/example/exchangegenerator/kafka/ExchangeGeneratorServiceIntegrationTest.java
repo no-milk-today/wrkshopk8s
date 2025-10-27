@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
         "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}"
 })
 @DirtiesContext
-@Disabled
 public class ExchangeGeneratorServiceIntegrationTest {
 
     @Autowired

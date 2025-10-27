@@ -27,6 +27,8 @@ spring:
       properties:
         # Disable addition of type headers in JSON serialization for simplicity
         spring.json.add.type.headers: false
+    topics:
+      customer-notification: customer-notification # Can be overridden with environment variable
   security:
     oauth2:
       resourceserver:

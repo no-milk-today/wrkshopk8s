@@ -9,10 +9,10 @@ import com.example.clients.fraud.FraudClient;
 import com.example.clients.notification.NotificationRequest;
 import com.example.clients.transfer.TransferRequest;
 import com.example.clients.transfer.TransferResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class TransferService {
 
@@ -29,6 +28,20 @@ public class TransferService {
     private final FraudClient fraudClient;
     private final KafkaTemplate<String, NotificationRequest> kafkaTemplate;
     private final ExchangeClient exchangeClient;
+
+    @Value("${spring.kafka.topics.transfer-notification}")
+    private String transferNotificationTopic;
+
+    public TransferService(
+            CustomerClient customerClient,
+            FraudClient fraudClient,
+            KafkaTemplate<String, NotificationRequest> kafkaTemplate,
+            ExchangeClient exchangeClient) {
+        this.customerClient = customerClient;
+        this.fraudClient = fraudClient;
+        this.kafkaTemplate = kafkaTemplate;
+        this.exchangeClient = exchangeClient;
+    }
 
     public TransferResponse transfer(String login, TransferRequest req) {
 
@@ -97,9 +110,9 @@ public class TransferService {
                             debitAmount, req.fromCurrency(),
                             creditAmount, req.toCurrency(),
                             sender.login(), login.equals(req.toLogin()) ? sender.login() : receiver.login());
-        kafkaTemplate.send("transfer-notification", new NotificationRequest(sender.id(), sender.name(), msg));
+        kafkaTemplate.send(transferNotificationTopic, new NotificationRequest(sender.id(), sender.name(), msg));
         if (!sender.login().equals(receiver.login())) {
-            kafkaTemplate.send("transfer-notification", new NotificationRequest(receiver.id(), receiver.name(), msg));
+            kafkaTemplate.send(transferNotificationTopic, new NotificationRequest(receiver.id(), receiver.name(), msg));
         }
 
         return TransferResponse.success();

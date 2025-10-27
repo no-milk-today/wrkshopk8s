@@ -12,11 +12,11 @@ import com.example.customerservice.repository.AccountRepository;
 import com.example.customerservice.repository.CustomerRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@AllArgsConstructor
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
@@ -33,6 +32,19 @@ public class CustomerService {
     private final FraudClient fraudClient;
     private final KafkaTemplate<String, NotificationRequest> kafkaTemplate;
 
+    @Value("${spring.kafka.topics.customer-notification}")
+    private String customerNotificationTopic;
+
+    public CustomerService(
+            CustomerRepository customerRepository,
+            AccountRepository accountRepository,
+            FraudClient fraudClient,
+            KafkaTemplate<String, NotificationRequest> kafkaTemplate) {
+        this.customerRepository = customerRepository;
+        this.accountRepository = accountRepository;
+        this.fraudClient = fraudClient;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     @CircuitBreaker(name = "fraudCheckService", fallbackMethod = "fraudCheckFallback")
     @Retry(name = "fraudCheckService")
@@ -88,7 +100,7 @@ public class CustomerService {
                         customer.getName())
         );
 
-        kafkaTemplate.send("customer-notification", notificationRequest);
+        kafkaTemplate.send(customerNotificationTopic, notificationRequest);
         log.info("Sent notification request to Kafka for customer: {}", customer.getId());
         return new CustomerRegistrationResponse(true, Collections.emptyList());
     }
