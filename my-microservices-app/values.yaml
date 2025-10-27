@@ -35,7 +35,7 @@ customer-service:
     # database_password_secret_key: "postgresql-password" # Key within the secret
     KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
     DDL_AUTO_MODE: "update"
-    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
 
 fraud-service:
   replicaCount: 1
@@ -80,7 +80,7 @@ notification-service:
   config:
     database_url: "jdbc:postgresql://{{ .Release.Name }}-notification-db:5432/notificationdb"
     database_username: "notification_user"
-    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
     # database_password_secret: "{{ .Release.Name }}-notification-db-postgresql"
     # database_password_secret_key: "postgresql-password"
 
@@ -108,7 +108,7 @@ exchange-service:
     # database_password_secret: "{{ .Release.Name }}-exchange-db-postgresql"
     # database_password_secret_key: "postgresql-password"
 
-    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
 
 exchange-generator-service:
   replicaCount: 1
@@ -128,7 +128,7 @@ exchange-generator-service:
           - path: /
             pathType: ImplementationSpecific
   config:
-    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
 
 cash-service:
   replicaCount: 1
@@ -149,7 +149,7 @@ cash-service:
             pathType: ImplementationSpecific
   config:
     KEYCLOAK_ISSUER_URL: "http://keycloak.prod.local/realms/bank-realm"
-    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
 
 transfer-service:
   replicaCount: 1
@@ -170,7 +170,7 @@ transfer-service:
             pathType: ImplementationSpecific
   config:
     KEYCLOAK_ISSUER_URL: "http://keycloak.prod.local/realms/bank-realm"
-    KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
 
 front-ui-service:
   replicaCount: 1

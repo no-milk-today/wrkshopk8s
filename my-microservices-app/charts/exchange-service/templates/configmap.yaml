@@ -22,3 +22,4 @@ data:
   # SPRING_DATASOURCE_PASSWORD would typically come from a secret, not this ConfigMap.
   DDL_AUTO_MODE: {{ .Values.config.DDL_AUTO_MODE | quote }}
   # Example: Include other config defined in values.yaml
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092

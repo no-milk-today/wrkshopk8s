@@ -75,3 +75,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+config:
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"

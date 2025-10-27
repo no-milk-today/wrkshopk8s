@@ -83,3 +83,4 @@ config:
   database_username: "myuser"
   KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
   DDL_AUTO_MODE: "update"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
