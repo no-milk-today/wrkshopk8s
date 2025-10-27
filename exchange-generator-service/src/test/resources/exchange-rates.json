@@ -1,0 +1,27 @@
+[
+  [
+    { "title": "Рубль", "name": "RUB", "value": 1.0 },
+    { "title": "Доллар", "name": "USD", "value": 92.50 },
+    { "title": "Юань", "name": "CNY", "value": 12.85 }
+  ],
+  [
+    { "title": "Рубль", "name": "RUB", "value": 1.0 },
+    { "title": "Доллар", "name": "USD", "value": 93.25 },
+    { "title": "Юань", "name": "CNY", "value": 13.10 }
+  ],
+  [
+    { "title": "Рубль", "name": "RUB", "value": 1.0 },
+    { "title": "Доллар", "name": "USD", "value": 94.00 },
+    { "title": "Юань", "name": "CNY", "value": 13.35 }
+  ],
+  [
+    { "title": "Рубль", "name": "RUB", "value": 1.0 },
+    { "title": "Доллар", "name": "USD", "value": 93.75 },
+    { "title": "Юань", "name": "CNY", "value": 13.20 }
+  ],
+  [
+    { "title": "Рубль", "name": "RUB", "value": 1.0 },
+    { "title": "Доллар", "name": "USD", "value": 92.80 },
+    { "title": "Юань", "name": "CNY", "value": 12.95 }
+  ]
+]
