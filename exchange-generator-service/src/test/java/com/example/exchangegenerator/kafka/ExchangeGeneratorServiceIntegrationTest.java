@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
@@ -39,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
         "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}"
 })
 @DirtiesContext
-@Import(ExchangeGeneratorService.class)
 public class ExchangeGeneratorServiceIntegrationTest {
 
     @Autowired
@@ -55,6 +53,7 @@ public class ExchangeGeneratorServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        assertNotNull(exchangeGeneratorService, "ExchangeGeneratorService should be autowired");
         var valueDeserializer = new JsonDeserializer<>(ExchangeRequest.class, objectMapper);
         valueDeserializer.addTrustedPackages("*");
         valueDeserializer.setUseTypeHeaders(false);
