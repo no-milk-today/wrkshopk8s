@@ -1,14 +1,12 @@
-package com.example.exchangegenerator.kafka;
+package com.example.exchangegenerator.service;
 
 import com.example.clients.exchange.ExchangeRateDto;
 import com.example.clients.exchange.ExchangeRequest;
-import com.example.exchangegenerator.service.ExchangeGeneratorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,14 +27,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-@EmbeddedKafka(
-        topics = { "exchange-rates" },
-        partitions = 1
-)
+@EmbeddedKafka(topics = {"exchange-rates"}, partitions = 1)
 @TestPropertySource(properties = {
-        "spring.kafka.producer.bootstrap-servers=${spring.embedded.kafka.brokers}",
-        "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}"
+    "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
+    "spring.kafka.producer.bootstrap-servers=${spring.embedded.kafka.brokers}",
+    "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}",
+    "spring.profiles.active=default"
 })
+@ActiveProfiles("default")
 @DirtiesContext
 public class ExchangeGeneratorServiceIntegrationTest {
 
@@ -54,18 +52,17 @@ public class ExchangeGeneratorServiceIntegrationTest {
     @BeforeEach
     void setUp() {
         assertNotNull(exchangeGeneratorService, "ExchangeGeneratorService should be autowired");
+
         var valueDeserializer = new JsonDeserializer<>(ExchangeRequest.class, objectMapper);
         valueDeserializer.addTrustedPackages("*");
         valueDeserializer.setUseTypeHeaders(false);
 
         var consumerProps = KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafkaBroker);
-
         consumerForTest = new DefaultKafkaConsumerFactory<>(
-                consumerProps,
-                new StringDeserializer(),
-                valueDeserializer
+                consumerProps, new StringDeserializer(), valueDeserializer
         ).createConsumer();
-        consumerForTest.subscribe(List.of("exchange-rates"));
+
+        consumerForTest.subscribe(List.of("exchange-rates")); // ваш топик
     }
 
     @AfterEach
@@ -91,7 +88,7 @@ public class ExchangeGeneratorServiceIntegrationTest {
         assertNotNull(sentRequest);
         assertThat(sentRequest.getRates()).isNotEmpty();
 
-        for (var rate : sentRequest.getRates()) {
+        for (ExchangeRateDto rate : sentRequest.getRates()) {
             assertThat(rate.getTitle()).isNotBlank();
             assertThat(rate.getName()).isNotBlank();
             assertThat(rate.getValue()).isGreaterThan(0);

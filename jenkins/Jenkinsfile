@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Build & Unit Tests') {
             steps {
-                sh 'mvn clean test'
+                sh 'mvn -T 1C clean test'  // T - parallel also
             }
         }
 
