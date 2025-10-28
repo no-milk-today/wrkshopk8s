@@ -10,3 +10,7 @@ image:
   repository: bitnamilegacy/zipkin
   tag: 3.5.1-debian-12-r5
   pullPolicy: IfNotPresent
+
+global:
+  security:
+    allowInsecureImages: true
