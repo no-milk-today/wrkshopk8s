@@ -79,3 +79,4 @@ affinity: {}
 config:
   KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
   KEYCLOAK_SERVER_URL: "http://keycloak.{{ .Release.Namespace }}.local"
+  ZIPKIN_URL: "http://zipkin.prod.svc.cluster.local:9411/api/v2/spans"

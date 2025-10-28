@@ -43,133 +43,6 @@ pipeline {
             }
         }
 
-//         stage('Install PostgreSQL to TEST') {
-//             steps {
-//                 sh """
-//                 helm upgrade --install postgres oci://registry-1.docker.io/bitnamicharts/postgresql \\
-//                   --namespace test --create-namespace \\
-//                   --set auth.database=${DB_NAME} \\
-//                   --set auth.username=${DB_USER} \\
-//                   --set auth.password=${DB_PASSWORD} \\
-//                   --set image.registry=docker.io \\
-//                   --set image.repository=bitnamilegacy/postgresql \\
-//                   --set image.tag=latest \\
-//                   --set image.pullPolicy=IfNotPresent \\
-//                   --set primary.persistence.enabled=false \\
-//                   --wait --timeout 5m
-//                 """
-//             }
-//         }
-//
-//         stage('Wait for PostgreSQL in TEST') {
-//             steps {
-//                 sh """
-//                 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql \\
-//                   -n test --timeout=300s
-//                 """
-//             }
-//         }
-//
-//         stage('Create DB Secrets for TEST') {
-//             steps {
-//                 sh """
-//                 kubectl create secret generic customer-service-customer-db \\
-//                   --from-literal=password=${DB_PASSWORD} \\
-//                   -n test --dry-run=client -o yaml | kubectl apply -f -
-//
-//                 kubectl create secret generic fraud-service-fraud-db \\
-//                   --from-literal=password=${DB_PASSWORD} \\
-//                   -n test --dry-run=client -o yaml | kubectl apply -f -
-//
-//                 kubectl create secret generic notification-service-notification-db \\
-//                   --from-literal=password=${DB_PASSWORD} \\
-//                   -n test --dry-run=client -o yaml | kubectl apply -f -
-//
-//                 kubectl create secret generic exchange-service-exchange-db \\
-//                   --from-literal=password=${DB_PASSWORD} \\
-//                   -n test --dry-run=client -o yaml | kubectl apply -f -
-//                 """
-//             }
-//         }
-//
-//         stage('Helm Deploy to TEST') {
-//             steps {
-//                 sh """
-//                 helm upgrade --install customer-service my-microservices-app/charts/customer-service \\
-//                   --namespace test --create-namespace \\
-//                   --set image.repository=customer-service \\
-//                   --set image.tag=${IMAGE_TAG} \\
-//                   --set ingress.enabled=true \\
-//                   --set ingress.hosts[0].host=customer.test.local \\
-//                   --set ingress.hosts[0].paths[0].path="/" \\
-//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
-//
-//                 helm upgrade --install fraud-service my-microservices-app/charts/fraud-service \\
-//                   --namespace test --create-namespace \\
-//                   --set image.repository=fraud-service \\
-//                   --set image.tag=${IMAGE_TAG} \\
-//                   --set ingress.enabled=true \\
-//                   --set ingress.hosts[0].host=fraud.test.local \\
-//                   --set ingress.hosts[0].paths[0].path="/" \\
-//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
-//
-//                 helm upgrade --install notification-service my-microservices-app/charts/notification-service \\
-//                   --namespace test --create-namespace \\
-//                   --set image.repository=notification-service \\
-//                   --set image.tag=${IMAGE_TAG} \\
-//                   --set ingress.enabled=true \\
-//                   --set ingress.hosts[0].host=notification.test.local \\
-//                   --set ingress.hosts[0].paths[0].path="/" \\
-//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
-//
-//                 helm upgrade --install exchange-service my-microservices-app/charts/exchange-service \\
-//                   --namespace test --create-namespace \\
-//                   --set image.repository=exchange-service \\
-//                   --set image.tag=${IMAGE_TAG} \\
-//                   --set ingress.enabled=true \\
-//                   --set ingress.hosts[0].host=exchange.test.local \\
-//                   --set ingress.hosts[0].paths[0].path="/" \\
-//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
-//
-//                 helm upgrade --install exchange-generator-service my-microservices-app/charts/exchange-generator-service \\
-//                   --namespace test --create-namespace \\
-//                   --set image.repository=exchange-generator-service \\
-//                   --set image.tag=${IMAGE_TAG} \\
-//                   --set ingress.enabled=true \\
-//                   --set ingress.hosts[0].host=exchange-generator.test.local \\
-//                   --set ingress.hosts[0].paths[0].path="/" \\
-//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
-//
-//                 helm upgrade --install cash-service my-microservices-app/charts/cash-service \\
-//                   --namespace test --create-namespace \\
-//                   --set image.repository=cash-service \\
-//                   --set image.tag=${IMAGE_TAG} \\
-//                   --set ingress.enabled=true \\
-//                   --set ingress.hosts[0].host=cash.test.local \\
-//                   --set ingress.hosts[0].paths[0].path="/" \\
-//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
-//
-//                 helm upgrade --install transfer-service my-microservices-app/charts/transfer-service \\
-//                   --namespace test --create-namespace \\
-//                   --set image.repository=transfer-service \\
-//                   --set image.tag=${IMAGE_TAG} \\
-//                   --set ingress.enabled=true \\
-//                   --set ingress.hosts[0].host=transfer.test.local \\
-//                   --set ingress.hosts[0].paths[0].path="/" \\
-//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
-//
-//                 helm upgrade --install front-ui-service my-microservices-app/charts/front-ui-service \\
-//                   --namespace test --create-namespace \\
-//                   --set image.repository=front-ui-service \\
-//                   --set image.tag=${IMAGE_TAG} \\
-//                   --set ingress.enabled=true \\
-//                   --set ingress.hosts[0].host=front-ui.test.local \\
-//                   --set ingress.hosts[0].paths[0].path="/" \\
-//                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
-//                 """
-//             }
-//         }
-
         stage('Manual Approval for PROD') {
             steps {
                 input message: 'Deploy to PROD environment?', ok: 'Yes, deploy'
@@ -221,6 +94,17 @@ pipeline {
                 kubectl create secret generic exchange-service-exchange-db \\
                   --from-literal=password=${DB_PASSWORD} \\
                   -n prod --dry-run=client -o yaml | kubectl apply -f -
+                """
+            }
+        }
+
+        stage('Deploy Zipkin to PROD') {
+            steps {
+                sh """
+                helm upgrade --install zipkin bitnami/zipkin \
+                  --namespace prod --create-namespace \
+                  -f my-microservices-app/helm/zipkin/values-zipkin.yaml \
+                  --wait --timeout 5m
                 """
             }
         }

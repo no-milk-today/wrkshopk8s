@@ -80,3 +80,4 @@ config:
   database_url: "jdbc:postgresql://postgres-postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/mydb"
   database_username: "myuser"
   KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  ZIPKIN_URL: "http://zipkin.prod.svc.cluster.local:9411/api/v2/spans"
