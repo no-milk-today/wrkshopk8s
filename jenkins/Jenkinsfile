@@ -101,6 +101,7 @@ pipeline {
         stage('Deploy Zipkin to PROD') {
             steps {
                 sh """
+                helm repo add bitnami https://charts.bitnami.com/bitnami
                 helm upgrade --install zipkin bitnami/zipkin \
                   --namespace prod --create-namespace \
                   -f my-microservices-app/helm/zipkin/values-zipkin.yaml \
