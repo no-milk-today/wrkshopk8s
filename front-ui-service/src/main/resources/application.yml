@@ -6,6 +6,8 @@ server:
   # to maintain correct redirect URIs and other forwarded information
 
 spring:
+  application:
+    name: front-ui-service
   security:
     oauth2:
       client:
@@ -29,6 +31,9 @@ keycloak:
 
 # Spring Boot Actuator endpoints
 management:
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411/api/v2/spans}
   endpoints:
     web:
       exposure:
