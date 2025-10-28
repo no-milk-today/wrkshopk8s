@@ -32,7 +32,7 @@ spring:
 management:
   zipkin:
     tracing:
-      endpoint: ${ZIPKIN_URL:http://zipkin:9411/api/v2/spans} # Эндпоинт Zipkin
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans} # Эндпоинт Zipkin
   tracing:
     sampling:
       probability: 1 # Частота отправляемых трейсов

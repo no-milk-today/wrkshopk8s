@@ -5,7 +5,7 @@ server:
 management:
   zipkin:
     tracing:
-      endpoint: ${ZIPKIN_URL:http://zipkin:9411/api/v2/spans}
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
   endpoints:
     web:
       exposure:
