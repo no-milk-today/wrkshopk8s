@@ -81,3 +81,4 @@ config:
   CUSTOMER_SERVICE_URL: "http://customer-service.{{ .Release.Namespace }}.svc.cluster.local:8081"
   FRONT_UI_SERVICE_URL: "http://front-ui-service.{{ .Release.Namespace }}.svc.cluster.local:8085"
   EXCHANGE_SERVICE_URL: "http://exchange-service.{{ .Release.Namespace }}.svc.cluster.local:8086"
+  ZIPKIN_URL: "http://zipkin.prod.svc.cluster.local:9411/api/v2/spans"

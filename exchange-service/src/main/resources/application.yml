@@ -3,6 +3,12 @@ server:
 
 # Spring Boot Actuator endpoints
 management:
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
+  tracing:
+    sampling:
+      probability: 1
   endpoints:
     web:
       exposure:
@@ -14,6 +20,8 @@ management:
 
 # Datasource Configuration (reads from environment variables set by Helm ConfigMap/Secrets)
 spring:
+  application:
+    name: exchange-service
   kafka:
     consumer:
       bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}

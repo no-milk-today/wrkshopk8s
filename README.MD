@@ -82,6 +82,16 @@ You can switch profiles by setting the SPRING_PROFILES_ACTIVE environment variab
 - Testcontainers
 - Maven
 - Keycloak (Authorization & Authentication)
+- Zipkin (Distributed Tracing)
+
+## Distributed Tracing with Zipkin
+
+The project uses Zipkin for distributed tracing to monitor and troubleshoot microservices-based architecture. All services are configured to send tracing data to a Zipkin server.
+
+- **Micrometer Tracing with Brave:** The application uses Micrometer Tracing with the Brave tracer implementation to instrument the code for tracing.
+- **Zipkin Reporter:** The `zipkin-reporter-brave` dependency sends the collected traces to the Zipkin server.
+- **Trace Propagation:** Traces are propagated across service boundaries, allowing to visualize the full lifecycle of a request.
+- **Zipkin UI:** The Zipkin UI can be used to view the traces and analyze the latency of the requests.
 
 ## Security & Authentication
 

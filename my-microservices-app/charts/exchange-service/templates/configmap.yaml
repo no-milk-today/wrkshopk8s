@@ -23,3 +23,4 @@ data:
   DDL_AUTO_MODE: {{ .Values.config.DDL_AUTO_MODE | quote }}
   # Example: Include other config defined in values.yaml
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  ZIPKIN_URL: "http://zipkin.prod.svc.cluster.local:9411/api/v2/spans"

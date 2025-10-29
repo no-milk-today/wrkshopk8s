@@ -3,6 +3,9 @@ server:
 
 # Spring Boot Actuator endpoints
 management:
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
   endpoints:
     web:
       exposure:
@@ -14,6 +17,8 @@ management:
 
 # Datasource Configuration (reads from environment variables set by Helm ConfigMap/Secrets)
 spring:
+  application:
+    name: fraud-service
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/fraud}
     username: ${SPRING_DATASOURCE_USERNAME:fraud_user} # Password should be provided via SPRING_DATASOURCE_PASSWORD environment variable (ideally from a Secret)

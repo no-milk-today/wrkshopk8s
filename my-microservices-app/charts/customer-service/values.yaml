@@ -84,3 +84,4 @@ config:
   KEYCLOAK_ISSUER_URL: "http://keycloak.{{ .Release.Namespace }}.local/realms/bank-realm"
   DDL_AUTO_MODE: "update"
   KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  ZIPKIN_URL: "http://zipkin.prod.svc.cluster.local:9411/api/v2/spans"
