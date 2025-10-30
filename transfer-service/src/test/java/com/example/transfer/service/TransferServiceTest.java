@@ -10,6 +10,8 @@ import com.example.clients.fraud.FraudCheckResponse;
 import com.example.clients.fraud.FraudClient;
 import com.example.clients.notification.NotificationRequest;
 import com.example.clients.transfer.TransferRequest;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -32,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class TransferServiceTest {
 
     @Mock
@@ -42,12 +47,19 @@ class TransferServiceTest {
     private KafkaTemplate<String, NotificationRequest> kafkaTemplate;
     @Mock
     private ExchangeClient exchangeClient;
+    @Mock
+    private MeterRegistry meterRegistry;
+
     @InjectMocks
     private TransferService underTest;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(underTest, "transferNotificationTopic", "transfer-notification");
+
+        var mockCounter = mock(Counter.class);
+        when(meterRegistry.counter(anyString())).thenReturn(mockCounter);
+        when(meterRegistry.counter(anyString(), any(String[].class))).thenReturn(mockCounter);
     }
 
     private static CustomerDto buildCustomer(int id, String login, BigDecimal balance) {
@@ -100,6 +112,8 @@ class TransferServiceTest {
                         tuple(1, "Name alice"),
                         tuple(2, "Name bob")
                 );
+
+        verify(meterRegistry).counter("transfer_operations_total", "status", "success");
     }
 
     @Test
@@ -119,6 +133,8 @@ class TransferServiceTest {
         assertThat(resp.getTransferErrors()).containsExactly("Fraud detected");
         verify(customerClient, never()).updateAccountBalance(anyString(), anyString(), any());
         verify(kafkaTemplate, never()).send(eq("transfer-notification"), any(NotificationRequest.class));
+
+        verify(meterRegistry).counter("transfer_operations_total", "status", "failed");
     }
 
     @Test
@@ -176,6 +192,11 @@ class TransferServiceTest {
 
         verify(customerClient).updateAccountBalance("user1", "USD", BigDecimal.valueOf(90));
         verify(customerClient).updateAccountBalance("user2", "RUB", BigDecimal.valueOf(950));
-    }
 
+        verify(meterRegistry).counter("currency_exchange_total",
+                "from_currency", "USD",
+                "to_currency", "RUB");
+
+        verify(meterRegistry).counter("transfer_operations_total", "status", "success");
+    }
 }
