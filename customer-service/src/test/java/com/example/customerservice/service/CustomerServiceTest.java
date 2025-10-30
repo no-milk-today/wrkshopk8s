@@ -12,12 +12,16 @@ import com.example.customerservice.model.Account;
 import com.example.customerservice.model.Customer;
 import com.example.customerservice.repository.AccountRepository;
 import com.example.customerservice.repository.CustomerRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -35,8 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CustomerServiceTest {
 
     @Mock
@@ -47,12 +53,19 @@ class CustomerServiceTest {
     private FraudClient fraudClient;
     @Mock
     private KafkaTemplate<String, NotificationRequest> kafkaTemplate;
+    @Mock
+    private MeterRegistry meterRegistry;
+
     @InjectMocks
     private CustomerService customerService;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(customerService, "customerNotificationTopic", "customer-notification");
+
+        var mockCounter = mock(Counter.class);
+        when(meterRegistry.counter(anyString())).thenReturn(mockCounter);
+        when(meterRegistry.counter(anyString(), any(String[].class))).thenReturn(mockCounter);
     }
 
     @Test
@@ -84,6 +97,8 @@ class CustomerServiceTest {
 
         assertTrue(result.success());
         verify(kafkaTemplate).send(eq("customer-notification"), any(NotificationRequest.class));
+
+        verify(meterRegistry).counter("customer_registrations_total");
     }
 
     @Test
