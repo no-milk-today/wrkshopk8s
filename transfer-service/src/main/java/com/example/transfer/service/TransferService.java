@@ -9,6 +9,7 @@ import com.example.clients.fraud.FraudClient;
 import com.example.clients.notification.NotificationRequest;
 import com.example.clients.transfer.TransferRequest;
 import com.example.clients.transfer.TransferResponse;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class TransferService {
     private final FraudClient fraudClient;
     private final KafkaTemplate<String, NotificationRequest> kafkaTemplate;
     private final ExchangeClient exchangeClient;
+    private final MeterRegistry meterRegistry;
 
     @Value("${spring.kafka.topics.transfer-notification}")
     private String transferNotificationTopic;
@@ -36,11 +38,13 @@ public class TransferService {
             CustomerClient customerClient,
             FraudClient fraudClient,
             KafkaTemplate<String, NotificationRequest> kafkaTemplate,
-            ExchangeClient exchangeClient) {
+            ExchangeClient exchangeClient,
+            MeterRegistry meterRegistry) {
         this.customerClient = customerClient;
         this.fraudClient = fraudClient;
         this.kafkaTemplate = kafkaTemplate;
         this.exchangeClient = exchangeClient;
+        this.meterRegistry = meterRegistry;
     }
 
     public TransferResponse transfer(String login, TransferRequest req) {
@@ -52,6 +56,7 @@ public class TransferService {
 
         if (fraudClient.isFraudster(sender.id()).isFraudster()) {
             ownErrors.add("Fraud detected");
+            meterRegistry.counter("transfer_operations_total", "status", "failed").increment();
             return TransferResponse.errors(ownErrors);
         }
 
@@ -70,6 +75,7 @@ public class TransferService {
                     .add("Destination account not found");
         }
         if (!ownErrors.isEmpty() || !otherErrors.isEmpty()) {
+            meterRegistry.counter("transfer_operations_total", "status", "failed").increment();
             return buildError(ownErrors, otherErrors);
         }
 
@@ -81,16 +87,19 @@ public class TransferService {
         } catch (Exception e) {
             log.error("Currency conversion failed: {}", e.getMessage(), e);
             ownErrors.add("Currency conversion failed: " + e.getMessage());
+            meterRegistry.counter("transfer_operations_total", "status", "failed").increment();
             return TransferResponse.errors(ownErrors);
         }
 
         // Проверка достаточности средств (всегда по исходной валюте)
         if (fromAcc.get().balance().compareTo(debitAmount) < 0) {
             ownErrors.add("Insufficient funds");
+            meterRegistry.counter("transfer_operations_total", "status", "failed").increment();
             return TransferResponse.errors(ownErrors);
         }
 
         if (!ownErrors.isEmpty() || !otherErrors.isEmpty()) {
+            meterRegistry.counter("transfer_operations_total", "status", "failed").increment();
             return buildError(ownErrors, otherErrors);
         }
 
@@ -114,6 +123,9 @@ public class TransferService {
         if (!sender.login().equals(receiver.login())) {
             kafkaTemplate.send(transferNotificationTopic, new NotificationRequest(receiver.id(), receiver.name(), msg));
         }
+
+        // successful transfer metric
+        meterRegistry.counter("transfer_operations_total", "status", "success").increment();
 
         return TransferResponse.success();
     }
@@ -141,6 +153,11 @@ public class TransferService {
         if (fromCurrency.equals(toCurrency)) {
             return amount;
         }
+
+        // Increment custom metric for currency exchange
+        meterRegistry.counter("currency_exchange_total",
+                "from_currency", fromCurrency,
+                "to_currency", toCurrency).increment();
 
         List<ExchangeRateDto> rates = exchangeClient.getRates();
         double fromRate = getRateValue(rates, fromCurrency);
