@@ -28,3 +28,13 @@ spec:
           annotations:
             summary: "Низкое количество регистраций пользователей"
             description: "За последний час зарегистрировалось только {{ $value | printf \"%.0f\" }} пользователей (порог: 1/hour)"
+
+        # Правило 3: Отсутствие обновления курсов валют
+        - alert: ExchangeRatesNotUpdating
+          expr: (time() - exchange_rates_last_update_timestamp_seconds) > 30  # Больше 30 секунд с последнего обновления
+          for: 1m                                                              # Должно длиться 1 минуту
+          labels:
+            severity: critical
+          annotations:
+            summary: "Exchange rates not updating"
+            description: "Exchange service hasn't received rate updates for {{ $value | printf \"%.0f\" }}s (threshold: 30s)"
