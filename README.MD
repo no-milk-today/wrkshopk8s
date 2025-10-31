@@ -83,6 +83,9 @@ You can switch profiles by setting the SPRING_PROFILES_ACTIVE environment variab
 - Maven
 - Keycloak (Authorization & Authentication)
 - Zipkin (Distributed Tracing)
+- Prometheus (Metrics Collection)
+- Grafana (Metrics Visualization)
+- Micrometer (Application Metrics)
 
 ## Distributed Tracing with Zipkin
 
@@ -92,6 +95,75 @@ The project uses Zipkin for distributed tracing to monitor and troubleshoot micr
 - **Zipkin Reporter:** The `zipkin-reporter-brave` dependency sends the collected traces to the Zipkin server.
 - **Trace Propagation:** Traces are propagated across service boundaries, allowing to visualize the full lifecycle of a request.
 - **Zipkin UI:** The Zipkin UI can be used to view the traces and analyze the latency of the requests.
+
+## Monitoring & Observability
+
+The project uses Prometheus Stack for comprehensive monitoring and alerting of all microservices.
+
+### Prometheus Stack Components
+
+- **Prometheus** - Metrics collection and storage with PromQL query language
+- **Grafana** - Metrics visualization with pre-configured dashboards
+- **Alertmanager** - Alert routing and management
+- **Node Exporter** - Hardware and OS metrics
+- **Kube State Metrics** - Kubernetes cluster state metrics
+
+### Custom Application Metrics
+
+All microservices expose custom Micrometer metrics via `/actuator/prometheus` endpoint:
+
+- **customer-service:**
+  - `customer_registrations_total` (Counter) - Total number of user registrations
+  - `customer_logins_total{result}` (Counter) - Login attempts (success/failed)
+
+- **fraud-service:**
+  - `fraud_checks_total{result}` (Counter) - Fraud check operations (pass/fail)
+
+- **exchange-service:**
+  - `exchange_rates_last_update_timestamp_seconds` (Gauge) - Timestamp of last exchange rate update
+
+- **transfer-service:**
+  - `transfers_total{result}` (Counter) - Money transfer operations (success/fail)
+
+- **cash-service:**
+  - `cash_operations_total{action,result}` (Counter) - Cash operations (deposit/withdraw, success/fail)
+
+### Prometheus Alerts
+
+The system includes pre-configured alerts for critical scenarios:
+
+- **LowFraudCheckRate** (Warning)
+  - Triggers when fraud check rate drops below 1/sec for 2 minutes
+  - Indicates possible integration issues with fraud service
+
+- **LowUserRegistrationRate** (Warning)
+  - Triggers when less than 1 user registers per hour
+  - May indicate problems with customer service or UI
+
+- **ExchangeRatesNotUpdating** (Critical)
+  - Triggers when exchange rates haven't been updated for more than 30 seconds
+  - Indicates issues with exchange-generator-service, Kafka, or exchange-service consumer
+
+### Accessing Monitoring Tools
+
+After successful deployment to Kubernetes, access Prometheus and Grafana using port-forwarding:
+
+```bash
+# Prometheus UI (metrics, alerts, targets)
+kubectl port-forward -n monitoring svc/prometheus-stack-kube-prom-prometheus 9090:9090
+
+# Grafana UI (dashboards, visualizations)
+kubectl port-forward -n monitoring svc/prometheus-stack-grafana 3000:80
+```
+
+**Access URLs:**
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3000 (credentials: admin/admin)
+
+**Useful Prometheus queries:**
+- `up` - Check service health
+- `rate(fraud_checks_total[5m])` - Fraud check rate
+- `time() - exchange_rates_last_update_timestamp_seconds` - Seconds since last exchange rate update
 
 ## Security & Authentication
 
@@ -285,6 +357,16 @@ The system consists of the following microservices running on different ports (d
 6. Make sure that keycloak is running in the cluster and accessible at `http://keycloak.prod.local`.
 5. Access the application via the configured domain names (`http://apigw.prod.local/signup`).
 6. After successful login redirect to http://apigw.prod.local/main
+7. Access monitoring tools using port-forwarding:
+   ```bash
+   # Prometheus UI
+   kubectl port-forward -n monitoring svc/prometheus-stack-kube-prom-prometheus 9090:9090
+
+   # Grafana UI
+   kubectl port-forward -n monitoring svc/prometheus-stack-grafana 3000:80
+   ```
+   - Prometheus: http://localhost:9090
+   - Grafana: http://localhost:3000 (credentials: admin/admin)
 
 ## Usage Examples
 
@@ -395,3 +477,159 @@ Content-Type: application/json
 
 ### using Front-UI:
 В браузере — форма отправляет POST `/user/{login}/cash`, параметры: currency, value, action ("DEPOSIT"/"WITHDRAW"). Front-UI вызывает Cash сервис, результат и ошибки отображаются на /main.
+
+## Grafana Dashboards
+
+After deploying the monitoring stack, you can visualize metrics using Grafana dashboards.
+
+### Accessing Grafana
+
+1. Port-forward to Grafana service:
+   ```bash
+   kubectl port-forward -n monitoring svc/prometheus-stack-grafana 3000:80
+   ```
+
+2. Open http://localhost:3000 in your browser
+
+3. Login with credentials:
+   - Username: `admin`
+   - Password: `admin`
+
+### Pre-configured Dashboard: Spring Boot 3.x Statistics
+
+The project includes comprehensive Spring Boot metrics for all microservices. Import the official Spring Boot dashboard:
+
+1. In Grafana UI, navigate to: **☰ (left menu) → Dashboards → Import**
+2. Enter Dashboard ID: **19004**
+3. Click **Load**
+4. Select Prometheus datasource: **Prometheus** (auto-configured)
+5. Click **Import**
+
+**Viewing Service Metrics:**
+1. Open the **Spring Boot 3.x Statistics** dashboard
+2. Select variables:
+   - `namespace`: **prod**
+   - `instance`: Choose a service (e.g., `customer-service`, `fraud-service`, `exchange-service`)
+3. View available metrics:
+   - HTTP Statistics (RPS, response times, status codes)
+   - JVM Memory (heap, non-heap, metaspace)
+   - Garbage Collection Statistics
+   - Thread Statistics
+   - Tomcat Statistics
+
+**Note:** Graphs may be empty for the first 1-2 minutes while metrics accumulate.
+
+### Custom Dashboard: Exchange Rates Freshness
+
+Create a custom panel to monitor exchange rate update freshness:
+
+1. In Grafana, navigate to: **☰ → Dashboards → New → New Dashboard**
+2. Click **Add visualization**
+3. Select **Prometheus** as data source
+4. Configure the panel:
+   - **Title:** Exchange Rates Freshness
+   - **PromQL Query:**
+     ```promql
+     time() - exchange_rates_last_update_timestamp_seconds
+     ```
+   - **Legend:** `Seconds since last update`
+   - **Unit:** `seconds (s)`
+   - **Visualization:** Time series (line chart)
+   - **Graph styles:**
+     - Line interpolation: Linear
+     - Fill opacity: 10
+     - Stacking: Normal
+   - **Legend placement:** Bottom
+   - **Tooltip mode:** All series
+
+5. Add threshold (optional):
+   - Click **Add threshold**
+   - Value: `30` (seconds)
+   - Color: Red
+   - This highlights when updates are delayed beyond the alert threshold
+
+6. Click **Apply** and **Save dashboard**
+
+**Interpreting the Graph:**
+- **Normal operation:** Line stays near 0-5 seconds (exchange-generator publishes every 5s)
+- **Warning:** Line exceeds 30 seconds (triggers `ExchangeRatesNotUpdating` alert)
+- **Critical issue:** Line continuously increases (Kafka or exchange-service consumer is down)
+
+### Custom Dashboard: Customer Registrations
+![img.png](screenshots/img.png)
+Create a panel to monitor user registration activity:
+
+1. In Grafana, navigate to: **☰ → Dashboards → New → New Dashboard** (or add to existing dashboard)
+2. Click **Add visualization**
+3. Select **Prometheus** as data source
+4. Configure the panel:
+   - **Title:** Customer Registrations
+   - **PromQL Query:**
+     ```promql
+     sum(increase(customer_registrations_total{namespace="prod"}[1h]))
+     ```
+   - **Legend:** `Registrations per hour`
+   - **Unit:** `short` (or `registrations` if you want custom unit)
+   - **Visualization:** Choose one:
+     - **Stat panel** - Shows current value as large number (good for single metric display)
+     - **Time series** - Shows trend over time (good for historical analysis)
+
+5. **For Stat panel:**
+   - **Graph mode:** None
+   - **Text mode:** Value and name
+   - **Color mode:** Value
+   - **Orientation:** Auto
+
+6. **For Time series panel:**
+   - **Graph styles:**
+     - Line interpolation: Linear
+     - Fill opacity: 20
+     - Line width: 2
+   - **Legend placement:** Bottom
+
+7. Add threshold (optional):
+   - Click **Add threshold**
+   - Value: `1` (minimum expected registrations per hour)
+   - Color: Red (below threshold) / Green (above threshold)
+   - This helps identify periods with low registration activity
+
+8. Click **Apply** and **Save dashboard**
+
+**Interpreting the Metric:**
+- **Healthy system:** Regular registrations throughout the day
+- **Warning:** Less than 1 registration per hour (triggers `LowUserRegistrationRate` alert)
+- **Investigation needed:** Sudden drop to zero (possible issues with customer-service or front-ui)
+
+### Other Useful Custom Panels
+
+**Fraud Check Rate:**
+```promql
+rate(fraud_checks_total[5m])
+```
+
+**User Registration Rate:**
+```promql
+rate(customer_registrations_total[1h])
+```
+
+**Successful vs Failed Transfers:**
+```promql
+rate(transfers_total{result="success"}[5m])
+rate(transfers_total{result="fail"}[5m])
+```
+
+**Cash Operations by Action:**
+```promql
+rate(cash_operations_total{action="deposit"}[5m])
+rate(cash_operations_total{action="withdraw"}[5m])
+```
+
+### Viewing Alerts in Grafana
+
+1. Navigate to: **☰ → Alerting → Alert rules**
+2. You should see alerts from Prometheus:
+   - `LowFraudCheckRate` (Warning)
+   - `LowUserRegistrationRate` (Warning)
+   - `ExchangeRatesNotUpdating` (Critical)
+
+3. To view active alerts, go to: **☰ → Alerting → Firing**
