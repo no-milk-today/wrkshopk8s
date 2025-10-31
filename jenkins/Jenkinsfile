@@ -153,6 +153,26 @@ pipeline {
             }
         }
 
+        stage('Move ServiceMonitor Files') {
+            steps {
+                sh """
+                # Create temp directory for ServiceMonitor files
+                mkdir -p temp-servicemonitors
+
+                # Move ServiceMonitor files out of templates to prevent namespace error
+                mv my-microservices-app/charts/customer-service/templates/servicemonitor.yaml temp-servicemonitors/customer-service-servicemonitor.yaml || true
+                mv my-microservices-app/charts/fraud-service/templates/servicemonitor.yaml temp-servicemonitors/fraud-service-servicemonitor.yaml || true
+                mv my-microservices-app/charts/notification-service/templates/servicemonitor.yaml temp-servicemonitors/notification-service-servicemonitor.yaml || true
+                mv my-microservices-app/charts/apigw-service/templates/servicemonitor.yaml temp-servicemonitors/apigw-service-servicemonitor.yaml || true
+                mv my-microservices-app/charts/front-ui-service/templates/servicemonitor.yaml temp-servicemonitors/front-ui-service-servicemonitor.yaml || true
+                mv my-microservices-app/charts/transfer-service/templates/servicemonitor.yaml temp-servicemonitors/transfer-service-servicemonitor.yaml || true
+                mv my-microservices-app/charts/exchange-generator-service/templates/servicemonitor.yaml temp-servicemonitors/exchange-generator-service-servicemonitor.yaml || true
+                mv my-microservices-app/charts/exchange-service/templates/servicemonitor.yaml temp-servicemonitors/exchange-service-servicemonitor.yaml || true
+                mv my-microservices-app/charts/cash-service/templates/servicemonitor.yaml temp-servicemonitors/cash-service-servicemonitor.yaml || true
+                """
+            }
+        }
+
         stage('Helm Deploy to PROD') {
             steps {
                 sh """
@@ -236,6 +256,83 @@ pipeline {
                   --set ingress.hosts[0].host=apigw.prod.local \\
                   --set ingress.hosts[0].paths[0].path="/" \\
                   --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+                """
+            }
+        }
+
+        stage('Deploy Prometheus Stack to PROD') {
+            steps {
+                sh """
+                helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+                helm repo update
+
+                kubectl create namespace monitoring || true
+
+                helm upgrade --install prometheus-stack prometheus-community/kube-prometheus-stack \
+                  --namespace monitoring --create-namespace \
+                  --set grafana.adminUser=admin \
+                  --set grafana.adminPassword=admin \
+                  --wait --timeout 10m
+                """
+            }
+        }
+
+        stage('Fix node-exporter for Docker Desktop') {
+            steps {
+                sh """
+                # Patch node-exporter to avoid volume mount issues on Docker Desktop
+                kubectl patch daemonset prometheus-stack-prometheus-node-exporter -n monitoring \
+                  --type='json' \
+                  -p='[{"op": "remove", "path": "/spec/template/spec/containers/0/volumeMounts/2"}, {"op": "remove", "path": "/spec/template/spec/volumes/2"}]' || true
+
+                # Wait for Prometheus stack to be fully ready
+                echo "Waiting for Prometheus stack to be ready..."
+                sleep 120
+                """
+            }
+        }
+
+
+        stage('Restore ServiceMonitor Files and Upgrade') {
+            steps {
+                sh """
+                # Restore ServiceMonitor files back to templates
+                mv temp-servicemonitors/customer-service-servicemonitor.yaml my-microservices-app/charts/customer-service/templates/servicemonitor.yaml || true
+                mv temp-servicemonitors/fraud-service-servicemonitor.yaml my-microservices-app/charts/fraud-service/templates/servicemonitor.yaml || true
+                mv temp-servicemonitors/notification-service-servicemonitor.yaml my-microservices-app/charts/notification-service/templates/servicemonitor.yaml || true
+                mv temp-servicemonitors/apigw-service-servicemonitor.yaml my-microservices-app/charts/apigw-service/templates/servicemonitor.yaml || true
+                mv temp-servicemonitors/front-ui-service-servicemonitor.yaml my-microservices-app/charts/front-ui-service/templates/servicemonitor.yaml || true
+                mv temp-servicemonitors/transfer-service-servicemonitor.yaml my-microservices-app/charts/transfer-service/templates/servicemonitor.yaml || true
+                mv temp-servicemonitors/exchange-generator-service-servicemonitor.yaml my-microservices-app/charts/exchange-generator-service/templates/servicemonitor.yaml || true
+                mv temp-servicemonitors/exchange-service-servicemonitor.yaml my-microservices-app/charts/exchange-service/templates/servicemonitor.yaml || true
+                mv temp-servicemonitors/cash-service-servicemonitor.yaml my-microservices-app/charts/cash-service/templates/servicemonitor.yaml || true
+
+                # Remove temp directory
+                rmdir temp-servicemonitors || true
+
+                # Upgrade all charts to apply ServiceMonitor
+                helm upgrade customer-service my-microservices-app/charts/customer-service -n prod
+                helm upgrade fraud-service my-microservices-app/charts/fraud-service -n prod
+                helm upgrade notification-service my-microservices-app/charts/notification-service -n prod
+                helm upgrade apigw-service my-microservices-app/charts/apigw-service -n prod
+                helm upgrade front-ui-service my-microservices-app/charts/front-ui-service -n prod
+                helm upgrade transfer-service my-microservices-app/charts/transfer-service -n prod
+                helm upgrade exchange-generator-service my-microservices-app/charts/exchange-generator-service -n prod
+                helm upgrade exchange-service my-microservices-app/charts/exchange-service -n prod
+                helm upgrade cash-service my-microservices-app/charts/cash-service -n prod
+                """
+            }
+        }
+
+        stage('Apply PrometheusRule') {
+            steps {
+                sh """
+                # Apply custom alerting rules
+                kubectl apply -f my-microservices-app/helm/prometheus/prometheusrule-simple.yaml
+
+                echo "Deployment complete! ServiceMonitors and PrometheusRules applied. Now execute the following commands:"
+                echo "kubectl port-forward -n monitoring svc/prometheus-stack-kube-prom-prometheus 9090:9090"
+                echo "kubectl port-forward -n monitoring svc/prometheus-stack-grafana 3000:80"
                 """
             }
         }
