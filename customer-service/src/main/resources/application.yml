@@ -7,6 +7,9 @@ management:
   zipkin:
     tracing:
       endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
+  tracing: #  для запросы в БД и Kafka
+    sampling:
+      probability: 1.0
   endpoints:
     web:
       exposure:

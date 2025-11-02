@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: bank-alerts
+  namespace: monitoring # Неймспейс, где работает Prometheus
+  labels:
+    release: prometheus-stack  # Название релиза Prometheus
+spec:
+  groups:
+    - name: bank.rules
+      rules:
+        # Правило 1: Низкая частота проверок fraud-service
+        - alert: LowFraudCheckRate
+          expr: sum(rate(fraud_checks_total[1m])) < 1  # Правило снижения fraud чеков — сумма по всем всем подам, меньше 1 проверки в секунду
+          for: 2m                                      # Запрос должен быть в статусе Pending в течение 2 минут
+          labels:
+            severity: warning
+          annotations:
+            summary: "Низкая частота проверок fraud-service"
+            description: "Количество fraud-проверок снизилось до {{ $value | printf \"%.2f\" }}/sec (порог: 1/sec). Возможна проблема с интеграцией."
+
+        # Правило 2: Низкое количество регистраций пользователей
+        - alert: LowUserRegistrationRate
+          expr: sum(increase(customer_registrations_total[1h])) < 1  # Меньше 1 регистрации за час
+          for: 1h                                                     # Должно длиться 1 час
+          labels:
+            severity: warning
+          annotations:
+            summary: "Низкое количество регистраций пользователей"
+            description: "За последний час зарегистрировалось только {{ $value | printf \"%.0f\" }} пользователей (порог: 1/hour)"
+
+        # Правило 3: Отсутствие обновления курсов валют
+        - alert: ExchangeRatesNotUpdating
+          expr: (time() - exchange_rates_last_update_timestamp_seconds) > 30  # Больше 30 секунд с последнего обновления
+          for: 1m                                                              # Должно длиться 1 минуту
+          labels:
+            severity: critical
+          annotations:
+            summary: "Exchange rates not updating"
+            description: "Exchange service hasn't received rate updates for {{ $value | printf \"%.0f\" }}s (threshold: 30s)"

@@ -12,6 +12,7 @@ import com.example.customerservice.repository.AccountRepository;
 import com.example.customerservice.repository.CustomerRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -31,6 +32,7 @@ public class CustomerService {
     private final AccountRepository accountRepository;
     private final FraudClient fraudClient;
     private final KafkaTemplate<String, NotificationRequest> kafkaTemplate;
+    private final MeterRegistry meterRegistry;
 
     @Value("${spring.kafka.topics.customer-notification}")
     private String customerNotificationTopic;
@@ -39,11 +41,13 @@ public class CustomerService {
             CustomerRepository customerRepository,
             AccountRepository accountRepository,
             FraudClient fraudClient,
-            KafkaTemplate<String, NotificationRequest> kafkaTemplate) {
+            KafkaTemplate<String, NotificationRequest> kafkaTemplate,
+            MeterRegistry meterRegistry) {
         this.customerRepository = customerRepository;
         this.accountRepository = accountRepository;
         this.fraudClient = fraudClient;
         this.kafkaTemplate = kafkaTemplate;
+        this.meterRegistry = meterRegistry;
     }
 
     @CircuitBreaker(name = "fraudCheckService", fallbackMethod = "fraudCheckFallback")
@@ -102,6 +106,10 @@ public class CustomerService {
 
         kafkaTemplate.send(customerNotificationTopic, notificationRequest);
         log.info("Sent notification request to Kafka for customer: {}", customer.getId());
+
+        // custom metric for successful registrations
+        meterRegistry.counter("customer_registrations_total").increment();
+
         return new CustomerRegistrationResponse(true, Collections.emptyList());
     }
 
@@ -162,7 +170,12 @@ public class CustomerService {
     // Агрегирующий метод для main
     public MainPageData getMainData(String login) {
         var customer = customerRepository.findByLogin(login)
-                .orElseThrow(() -> new NoSuchElementException("Customer not found " + login));
+                .orElseThrow(() -> {
+                    // Track failed login attempts (user authenticated in Keycloak but not found in DB)
+                    meterRegistry.counter("customer_logins_total", "result", "failed").increment();
+                    log.warn("Failed login attempt: user {} authenticated in Keycloak but not found in customer database", login);
+                    return new NoSuchElementException("Customer not found " + login);
+                });
 
         var accountsDto = Arrays.stream(Currency.values())
                 .map(currency -> {
@@ -290,7 +303,12 @@ public class CustomerService {
 
     public CustomerDto getCustomerByLogin(String login) {
         var customer = customerRepository.findByLogin(login)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found: " + login));
+                .orElseThrow(() -> {
+                    // Track failed login attempts (user authenticated in Keycloak but not found in DB)
+                    meterRegistry.counter("customer_logins_total", "result", "failed").increment();
+                    log.warn("Failed login attempt: user {} authenticated in Keycloak but not found in customer database", login);
+                    return new CustomerNotFoundException("Customer not found: " + login);
+                });
 
         return new CustomerDto(
                 customer.getId(),
