@@ -86,6 +86,10 @@ You can switch profiles by setting the SPRING_PROFILES_ACTIVE environment variab
 - Prometheus (Metrics Collection)
 - Grafana (Metrics Visualization)
 - Micrometer (Application Metrics)
+- **ELK Stack (Elasticsearch, Logstash, Kibana)** - Centralized logging system
+  - **Elasticsearch** - Log storage and search engine
+  - **Logstash** - Log aggregation and processing pipeline
+  - **Kibana** - Log visualization and analysis UI
 
 ## Distributed Tracing with Zipkin
 
@@ -357,16 +361,24 @@ The system consists of the following microservices running on different ports (d
 6. Make sure that keycloak is running in the cluster and accessible at `http://keycloak.prod.local`.
 5. Access the application via the configured domain names (`http://apigw.prod.local/signup`).
 6. After successful login redirect to http://apigw.prod.local/main
-7. Access monitoring tools using port-forwarding:
+7. Access monitoring and logging tools using port-forwarding:
    ```bash
-   # Prometheus UI
+   # Prometheus UI (metrics, alerts, targets)
    kubectl port-forward -n monitoring svc/prometheus-stack-kube-prom-prometheus 9090:9090
 
-   # Grafana UI
+   # Grafana UI (dashboards, visualizations)
    kubectl port-forward -n monitoring svc/prometheus-stack-grafana 3000:80
+
+   # Kibana UI (log visualization and search)
+   kubectl port-forward -n logging svc/kibana-kibana 5601:5601
+
+   # Elasticsearch API (direct log queries)
+   kubectl port-forward -n logging svc/elasticsearch-elasticsearch 9200:9200
    ```
    - Prometheus: http://localhost:9090
    - Grafana: http://localhost:3000 (credentials: admin/admin)
+   - Kibana: http://localhost:5601
+   - Elasticsearch: http://localhost:9200
 
 ## Usage Examples
 
