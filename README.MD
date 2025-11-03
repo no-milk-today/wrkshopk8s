@@ -169,6 +169,88 @@ kubectl port-forward -n monitoring svc/prometheus-stack-grafana 3000:80
 - `rate(fraud_checks_total[5m])` - Fraud check rate
 - `time() - exchange_rates_last_update_timestamp_seconds` - Seconds since last exchange rate update
 
+## Centralized Logging with ELK Stack
+
+The project uses ELK Stack (Elasticsearch, Logstash, Kibana) for centralized logging and log analysis across all microservices.
+
+### Architecture
+
+```
+Spring Boot Services (customer-service, fraud-service, etc.)
+    ↓ (Logback Kafka Appender - JSON format)
+Kafka Topics (logs-error, logs-warn, logs-info, logs-debug) [namespace: prod]
+    ↓ (Logstash Consumer)
+Elasticsearch [namespace: logging]
+    ↓
+Kibana UI [namespace: logging]
+```
+
+### Log Structure
+
+All microservices send structured JSON logs to Kafka with the following fields:
+- `@timestamp` - Log timestamp
+- `level` - Log level (ERROR, WARN, INFO, DEBUG)
+- `message` - Log message content
+- `service` - Service name (e.g., "customer-service")
+- `traceId` - Distributed tracing ID from Micrometer
+- `spanId` - Span ID for request tracking
+- `thread` - Thread name
+- `logger` - Logger class name
+- `kafka_topic` - Source Kafka topic (logs-error, logs-warn, etc.)
+
+### Kafka Log Topics
+
+- **logs-error** - ERROR level logs (3 partitions, 7 days retention)
+- **logs-warn** - WARN level logs (3 partitions, 7 days retention)
+- **logs-info** - INFO level logs (3 partitions, 7 days retention)
+- **logs-debug** - DEBUG level logs (3 partitions, 7 days retention)
+
+### ELK Components Deployed via Helm
+
+The ELK stack is deployed as separate Helm charts in the `logging` namespace:
+
+1. **Elasticsearch** (`my-microservices-app/charts/elasticsearch/`)
+   - Single-node cluster for log storage
+   - Indexes logs by service and date: `logs-{service}-{YYYY.MM.dd}`
+
+2. **Logstash** (`my-microservices-app/charts/logstash/`)
+   - Consumes logs from Kafka topics
+   - Consumer group: `logstash-consumer-group`
+   - Sends logs to Elasticsearch
+
+3. **Kibana** (`my-microservices-app/charts/kibana/`)
+   - Connected to Elasticsearch for querying logs
+
+### Accessing ELK Components
+
+After deployment, access ELK components using port-forwarding:
+
+```bash
+kubectl port-forward -n logging svc/kibana-kibana 5601:5601
+kubectl port-forward -n logging svc/elasticsearch-elasticsearch 9200:9200
+kubectl port-forward -n logging svc/logstash-logstash 9600:9600
+```
+
+**Access URLs:**
+- Kibana: http://localhost:5601
+- Elasticsearch: http://localhost:9200
+- Logstash: http://localhost:9600
+
+### Using Kibana
+
+1. Create index pattern: `logs-*`
+2. Select time field: `@timestamp`
+3. Go to **Discover** to view and search logs
+
+**Useful Kibana filters:**
+- Filter by service: `service: "customer-service"`
+- Filter by log level: `level: "ERROR"`
+- Filter by trace ID: `traceId: "your-trace-id"`
+- Filter by topic: `kafka_topic: "logs-error"`
+
+### Log Retention
+- Kafka topics: 7 days retention (604800000 ms)
+
 ## Security & Authentication
 
 - **Keycloak** (OIDC, port 8090 (if not k8s), realm: `bank-realm`) provides authentication and JWT tokens.
