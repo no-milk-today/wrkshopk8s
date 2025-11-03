@@ -40,6 +40,8 @@ done
 echo "Deleting namespaces..."
 kubectl delete ns test --ignore-not-found
 kubectl delete ns prod --ignore-not-found
+kubectl delete ns monitoring --ignore-not-found
+kubectl delete ns logging --ignore-not-found
 
 echo "Shutting down Jenkins..."
 docker compose down -v || true
