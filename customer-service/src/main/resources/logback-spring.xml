@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="applicationName" source="spring.application.name"/>
+    <property name="kafkaBootstrapServers" value="${KAFKA_BOOTSTRAP_SERVERS:-localhost:9092}"/>
+
+    <!-- Console Appender for local development -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [traceId=%X{traceId:-}, spanId=%X{spanId:-}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Kafka Appender for ERROR logs -->
+    <appender name="KAFKA_ERROR" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${applicationName}"}</customFields>
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>spanId</includeMdcKeyName>
+        </encoder>
+        <topic>logs-error</topic>
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy"/>
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
+        <producerConfig>bootstrap.servers=${kafkaBootstrapServers}</producerConfig>
+        <producerConfig>acks=1</producerConfig>
+        <producerConfig>retries=3</producerConfig>
+        <producerConfig>max.block.ms=5000</producerConfig>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- Kafka Appender for WARN logs -->
+    <appender name="KAFKA_WARN" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${applicationName}"}</customFields>
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>spanId</includeMdcKeyName>
+        </encoder>
+        <topic>logs-warn</topic>
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy"/>
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
+        <producerConfig>bootstrap.servers=${kafkaBootstrapServers}</producerConfig>
+        <producerConfig>acks=1</producerConfig>
+        <producerConfig>retries=3</producerConfig>
+        <producerConfig>max.block.ms=5000</producerConfig>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- Kafka Appender for INFO logs -->
+    <appender name="KAFKA_INFO" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${applicationName}"}</customFields>
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>spanId</includeMdcKeyName>
+        </encoder>
+        <topic>logs-info</topic>
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy"/>
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
+        <producerConfig>bootstrap.servers=${kafkaBootstrapServers}</producerConfig>
+        <producerConfig>acks=1</producerConfig>
+        <producerConfig>retries=3</producerConfig>
+        <producerConfig>max.block.ms=5000</producerConfig>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- Kafka Appender for DEBUG logs -->
+    <appender name="KAFKA_DEBUG" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${applicationName}"}</customFields>
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>spanId</includeMdcKeyName>
+        </encoder>
+        <topic>logs-debug</topic>
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy"/>
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
+        <producerConfig>bootstrap.servers=${kafkaBootstrapServers}</producerConfig>
+        <producerConfig>acks=1</producerConfig>
+        <producerConfig>retries=3</producerConfig>
+        <producerConfig>max.block.ms=5000</producerConfig>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- Async wrapper for performance -->
+    <appender name="ASYNC_KAFKA_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="KAFKA_ERROR"/>
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="ASYNC_KAFKA_WARN" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="KAFKA_WARN"/>
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="ASYNC_KAFKA_INFO" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="KAFKA_INFO"/>
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="ASYNC_KAFKA_DEBUG" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="KAFKA_DEBUG"/>
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <!-- Logger configuration -->
+    <logger name="com.example.customerservice" level="DEBUG"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_KAFKA_ERROR"/>
+        <appender-ref ref="ASYNC_KAFKA_WARN"/>
+        <appender-ref ref="ASYNC_KAFKA_INFO"/>
+        <appender-ref ref="ASYNC_KAFKA_DEBUG"/>
+    </root>
+</configuration>

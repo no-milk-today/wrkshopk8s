@@ -142,6 +142,61 @@ pipeline {
             }
         }
 
+        stage('Deploy ELK Stack to LOGGING') {
+            steps {
+                sh """
+                # Create logging namespace
+                kubectl create namespace logging || true
+
+                # Create Kafka log topics
+                kubectl exec kafka-controller-0 -n prod -- kafka-topics.sh \\
+                  --bootstrap-server localhost:9092 --create --if-not-exists \\
+                  --topic logs-error --partitions 3 --replication-factor 1 \\
+                  --config retention.ms=604800000 || true
+
+                kubectl exec kafka-controller-0 -n prod -- kafka-topics.sh \\
+                  --bootstrap-server localhost:9092 --create --if-not-exists \\
+                  --topic logs-warn --partitions 3 --replication-factor 1 \\
+                  --config retention.ms=604800000 || true
+
+                kubectl exec kafka-controller-0 -n prod -- kafka-topics.sh \\
+                  --bootstrap-server localhost:9092 --create --if-not-exists \\
+                  --topic logs-info --partitions 3 --replication-factor 1 \\
+                  --config retention.ms=604800000 || true
+
+                kubectl exec kafka-controller-0 -n prod -- kafka-topics.sh \\
+                  --bootstrap-server localhost:9092 --create --if-not-exists \\
+                  --topic logs-debug --partitions 3 --replication-factor 1 \\
+                  --config retention.ms=604800000 || true
+
+                # Deploy Elasticsearch
+                helm upgrade --install elasticsearch my-microservices-app/charts/elasticsearch \\
+                  --namespace logging --create-namespace \\
+                  --set enabled=true --set replicas=1 \\
+                  --wait --timeout 5m
+
+                # Deploy Logstash
+                helm upgrade --install logstash my-microservices-app/charts/logstash \\
+                  --namespace logging \\
+                  --set enabled=true \\
+                  --set kafka.bootstrapServers="kafka.prod.svc.cluster.local:9092" \\
+                  --set elasticsearch.hosts="http://elasticsearch-elasticsearch.logging.svc.cluster.local:9200" \\
+                  --wait --timeout 5m
+
+                # Deploy Kibana
+                helm upgrade --install kibana my-microservices-app/charts/kibana \\
+                  --namespace logging \\
+                  --set enabled=true \\
+                  --set elasticsearch.hosts="http://elasticsearch-elasticsearch.logging.svc.cluster.local:9200" \\
+                  --wait --timeout 5m
+
+                echo "ELK Stack deployed successfully!"
+                echo "Access Kibana: kubectl port-forward -n logging svc/kibana-kibana 5601:5601"
+                echo "Then open http://localhost:5601"
+                """
+            }
+        }
+
         stage('Wait for Keycloak Ready') {
             steps {
                 sh """

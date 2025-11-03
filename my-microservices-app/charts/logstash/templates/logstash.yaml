@@ -1,0 +1,127 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-logstash-config
+  labels:
+    app: logstash
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    xpack.monitoring.enabled: false
+  logstash.conf: |
+    input {
+      kafka {
+        bootstrap_servers => "{{ .Values.kafka.bootstrapServers }}"
+        topics => {{ .Values.kafka.topics | toJson }}
+        group_id => "{{ .Values.kafka.consumerGroupId }}"
+        codec => json
+        consumer_threads => 4
+        decorate_events => true
+      }
+    }
+
+    filter {
+      # Add Kafka metadata
+      mutate {
+        add_field => { "kafka_topic" => "%{[@metadata][kafka][topic]}" }
+        add_field => { "kafka_partition" => "%{[@metadata][kafka][partition]}" }
+        add_field => { "kafka_offset" => "%{[@metadata][kafka][offset]}" }
+      }
+
+      # Extract log level from topic name (logs-error -> ERROR)
+      if [kafka_topic] =~ /logs-/ {
+        ruby {
+          code => "event.set('log_level_from_topic', event.get('kafka_topic').split('-').last.upcase)"
+        }
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => ["{{ .Values.elasticsearch.hosts }}"]
+        index => "logs-%{[service]}-%{+YYYY.MM.dd}"
+        document_type => "_doc"
+      }
+
+      # Debug output to stdout
+      stdout {
+        codec => rubydebug
+      }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-logstash
+  labels:
+    app: logstash
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: 9600
+    name: http
+  selector:
+    app: logstash
+    release: "{{ .Release.Name }}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-logstash
+  labels:
+    app: logstash
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+      release: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        app: logstash
+        release: "{{ .Release.Name }}"
+    spec:
+      containers:
+      - name: logstash
+        image: "{{ .Values.image }}:{{ .Values.imageTag }}"
+        imagePullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
+        ports:
+        - containerPort: 9600
+          name: http
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/logstash/config/logstash.yml
+          subPath: logstash.yml
+        - name: config-volume
+          mountPath: /usr/share/logstash/pipeline/logstash.conf
+          subPath: logstash.conf
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9600
+          initialDelaySeconds: 120
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9600
+          initialDelaySeconds: 60
+          periodSeconds: 5
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Release.Name }}-logstash-config
+{{- end }}

@@ -1,0 +1,25 @@
+# Default values for kibana
+enabled: true
+# Kibana image
+image: "docker.elastic.co/kibana/kibana"
+imageTag: "8.5.1"
+imagePullPolicy: "IfNotPresent"
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+# Service configuration
+service:
+  type: ClusterIP
+  port: 5601
+# Probe configuration
+probes:
+  livenessInitialDelaySeconds: 120
+  readinessInitialDelaySeconds: 60
+# Elasticsearch configuration
+elasticsearch:
+  hosts: "http://elasticsearch.logging.svc.cluster.local:9200"

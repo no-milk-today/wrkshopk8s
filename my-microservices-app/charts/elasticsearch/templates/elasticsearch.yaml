@@ -1,0 +1,79 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-elasticsearch
+  labels:
+    app: elasticsearch
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: 9200
+    name: http
+  selector:
+    app: elasticsearch
+    release: "{{ .Release.Name }}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-elasticsearch
+  labels:
+    app: elasticsearch
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: elasticsearch
+      release: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+        release: "{{ .Release.Name }}"
+    spec:
+      containers:
+      - name: elasticsearch
+        image: "{{ .Values.image }}:{{ .Values.imageTag }}"
+        imagePullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
+        env:
+        - name: discovery.type
+          value: "single-node"
+        - name: ES_JAVA_OPTS
+          value: "-Xms1g -Xmx1g"
+        - name: xpack.security.enabled
+          value: "false"
+        - name: xpack.security.http.ssl.enabled
+          value: "false"
+        - name: xpack.security.transport.ssl.enabled
+          value: "false"
+        ports:
+        - containerPort: 9200
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9200
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.probes.livenessInitialDelaySeconds | default 90 }}
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9200
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.probes.readinessInitialDelaySeconds | default 60 }}
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+{{- end }}
