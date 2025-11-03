@@ -1,0 +1,74 @@
+# Default values for logstash
+enabled: true
+# Logstash image
+image: "docker.elastic.co/logstash/logstash"
+imageTag: "8.5.1"
+imagePullPolicy: "IfNotPresent"
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+# Service configuration
+service:
+  type: ClusterIP
+  port: 9600
+# Kafka configuration
+kafka:
+  bootstrapServers: "kafka.prod.svc.cluster.local:9092"
+  topics:
+    - logs-error
+    - logs-warn
+    - logs-info
+    - logs-debug
+  consumerGroupId: "logstash-consumer-group"
+
+# Elasticsearch configuration
+elasticsearch:
+  hosts: "http://elasticsearch.logging.svc.cluster.local:9200"
+
+# Logstash pipeline configuration
+logstashPipeline:
+  logstash.conf: |
+    input {
+      kafka {
+        bootstrap_servers => "{{ .Values.kafka.bootstrapServers }}"
+        topics => {{ .Values.kafka.topics | toJson }}
+        group_id => "{{ .Values.kafka.consumerGroupId }}"
+        codec => json
+        consumer_threads => 4
+        decorate_events => true
+      }
+    }
+
+    filter {
+      # Add Kafka metadata
+      mutate {
+        add_field => { "kafka_topic" => "%{[@metadata][kafka][topic]}" }
+        add_field => { "kafka_partition" => "%{[@metadata][kafka][partition]}" }
+        add_field => { "kafka_offset" => "%{[@metadata][kafka][offset]}" }
+      }
+
+      # Extract log level from topic name (logs-error -> ERROR)
+      if [kafka_topic] =~ /logs-/ {
+        ruby {
+          code => "event.set('log_level_from_topic', event.get('kafka_topic').split('-').last.upcase)"
+        }
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => ["{{ .Values.elasticsearch.hosts }}"]
+        index => "logs-%{[service]}-%{+YYYY.MM.dd}"
+        document_type => "_doc"
+      }
+
+      # Debug output to stdout
+      stdout {
+        codec => rubydebug
+      }
+    }
